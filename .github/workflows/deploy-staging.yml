@@ -13,7 +13,7 @@ jobs:
   deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    if: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && secrets.STAGING_SSH_KEY != '' && secrets.STAGING_SERVER_HOST != '' && secrets.STAGING_SERVER_USER != '' && secrets.STAGING_APP_PATH != '' && secrets.STAGING_APP_URL != '' && secrets.SLACK_WEBHOOK_URL != '' }}
 
     steps:
       - name: Checkout code
@@ -98,3 +98,13 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+
+  deploy-skipped:
+    name: Deploy (Skipped)
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && (secrets.STAGING_SSH_KEY == '' || secrets.STAGING_SERVER_HOST == '' || secrets.STAGING_SERVER_USER == '' || secrets.STAGING_APP_PATH == '' || secrets.STAGING_APP_URL == '' || secrets.SLACK_WEBHOOK_URL == '') }}
+    steps:
+      - name: Explain skip
+        run: |
+          echo "## ℹ️ Staging deploy skipped" >> $GITHUB_STEP_SUMMARY
+          echo "Missing staging deployment secrets. Configure STAGING_SSH_KEY, STAGING_SERVER_HOST, STAGING_SERVER_USER, STAGING_APP_PATH, STAGING_APP_URL and SLACK_WEBHOOK_URL to enable this workflow." >> $GITHUB_STEP_SUMMARY
