@@ -4,7 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { ProductsModule } from './products/products.module';
 import { User } from './auth/entities/user.entity';
+import { Product, Category, Review } from './products/entities';
 
 @Module({
   imports: [
@@ -21,7 +23,7 @@ import { User } from './auth/entities/user.entity';
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User],
+        entities: [User, Product, Category, Review],
         synchronize: true, // true en dev para auto-crear tablas, false en prod (usar migraciones)
         logging: false, // Desabilitar logging para reducir ruido
         retryAttempts: 10,
@@ -30,6 +32,7 @@ import { User } from './auth/entities/user.entity';
       }),
     }),
     AuthModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

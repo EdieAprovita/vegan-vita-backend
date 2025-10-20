@@ -34,17 +34,17 @@
 
 ### 🏗️ Stack Tecnológico
 
-| Tecnología | Versión | Uso |
-|-----------|---------|-----|
-| NestJS | 9.4.3 | Framework backend |
-| TypeScript | 4.9.5 | Lenguaje |
-| TypeORM | 0.3.27 | ORM |
-| PostgreSQL | 16-alpine | Base de datos |
-| Passport.js | - | Autenticación |
-| JWT | 7 días | Tokens |
-| Bcrypt | - | Hashing de contraseñas |
-| Docker | - | Containerización |
-| PNPM | 10+ | Package manager |
+| Tecnología  | Versión   | Uso                    |
+| ----------- | --------- | ---------------------- |
+| NestJS      | 9.4.3     | Framework backend      |
+| TypeScript  | 4.9.5     | Lenguaje               |
+| TypeORM     | 0.3.27    | ORM                    |
+| PostgreSQL  | 16-alpine | Base de datos          |
+| Passport.js | -         | Autenticación          |
+| JWT         | 7 días    | Tokens                 |
+| Bcrypt      | -         | Hashing de contraseñas |
+| Docker      | -         | Containerización       |
+| PNPM        | 10+       | Package manager        |
 
 ## 🚀 Instalación y Configuración
 
@@ -150,6 +150,7 @@ Authorization: Bearer <token>
 ### 📊 Respuestas Esperadas
 
 **Registro exitoso (201 Created):**
+
 ```json
 {
   "user": {
@@ -162,6 +163,7 @@ Authorization: Bearer <token>
 ```
 
 **Credenciales inválidas (401 Unauthorized):**
+
 ```json
 {
   "statusCode": 401,
@@ -225,11 +227,13 @@ Este es un proyecto personal en desarrollo. Para cambios importantes, abre un is
 ## 📝 Notas de Desarrollo
 
 ### Fase Actual: Autenticación ✅
+
 - Usuario CRUD con bcrypt
 - JWT tokens con expiración
 - Endpoints protegidos con guards
 
 ### Próximas Fases:
+
 1. Módulo de Productos (CRUD)
 2. Módulo de Órdenes
 3. Integración Stripe
@@ -238,6 +242,7 @@ Este es un proyecto personal en desarrollo. Para cambios importantes, abre un is
 ## 🐛 Solución de Problemas
 
 ### Puerto 5432 en uso
+
 ```bash
 # Detener PostgreSQL local si está corriendo
 brew services stop postgresql@14
@@ -247,6 +252,7 @@ DB_PORT=5433
 ```
 
 ### Error: "database does not exist"
+
 ```bash
 # Recrear containers
 docker-compose down
@@ -254,6 +260,7 @@ docker-compose up -d
 ```
 
 ### TypeORM entities no se cargan
+
 ```bash
 # Asegurar que entities está en app.module.ts
 entities: [User]  // Entidades explícitas
