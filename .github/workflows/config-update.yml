@@ -1,0 +1,39 @@
+name: Update Configuration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  update-config:
+    name: Update ${{ github.event.inputs.environment }} Config
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Generate environment config
+        run: |
+          echo "Preparing config for ${{ github.event.inputs.environment }}"
+          # Add your configuration generation here
+
+      - name: Deploy configuration
+        run: |
+          echo "Deploying configuration to ${{ github.event.inputs.environment }}"
+          # Add your deployment script
+
+      - name: Verify deployment
+        run: |
+          echo "Verifying configuration deployment"
+          # Add verification script

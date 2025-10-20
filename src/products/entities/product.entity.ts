@@ -10,7 +10,6 @@ import {
   Index,
 } from 'typeorm';
 import { Category } from './category.entity';
-import { Review } from './review.entity';
 
 @Entity('products')
 @Index(['slug'], { unique: true })
@@ -42,8 +41,8 @@ export class Product {
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
-  @OneToMany(() => Review, (review) => review.product, { eager: true })
-  reviews: Review[];
+  @OneToMany('Review', 'product', { eager: true })
+  reviews: any[];
 
   @CreateDateColumn()
   createdAt: Date;

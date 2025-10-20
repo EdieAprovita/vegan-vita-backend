@@ -1,0 +1,48 @@
+name: Feature Request
+description: Propone una nueva funcionalidad
+title: "[FEATURE] "
+labels: [ "enhancement" ]
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      ## ✨ Feature Request
+      ¡Nos encantaría escuchar tus ideas! Por favor, completa el formulario.
+
+- type: textarea
+  id: problem
+  attributes:
+    label: ¿Cuál es el problema?
+    placeholder: "Describe el problema que quieres resolver..."
+  validations:
+    required: true
+
+- type: textarea
+  id: solution
+  attributes:
+    label: Solución propuesta
+    placeholder: "¿Cómo te gustaría que se resolviera?"
+  validations:
+    required: true
+
+- type: textarea
+  id: alternatives
+  attributes:
+    label: Alternativas consideradas
+    placeholder: "¿Hay otras formas de resolver esto?"
+
+- type: textarea
+  id: context
+  attributes:
+    label: Contexto adicional
+    placeholder: "¿Información adicional? Screenshots, enlaces, etc."
+
+- type: checkboxes
+  attributes:
+    label: Confirmaciones
+    options:
+    - label: Esta feature no existe en la roadmap actual
+      required: true
+    - label: Reviré issues existentes similares
+      required: true

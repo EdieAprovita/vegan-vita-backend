@@ -1,0 +1,86 @@
+name: Bug Report
+description: Reporta un bug encontrado
+title: "[BUG] "
+labels: [ "bug" ]
+
+body:
+- type: markdown
+  attributes:
+    value: |
+      ## 🐛 Reporte de Bug
+      Gracias por reportar un bug. Por favor, completa el formulario a continuación.
+
+- type: input
+  id: title
+  attributes:
+    label: Título descriptivo
+    placeholder: "Breve descripción del problema"
+  validations:
+    required: true
+
+- type: textarea
+  id: description
+  attributes:
+    label: Descripción
+    description: Describe el bug detalladamente
+    placeholder: "¿Qué pasó? ¿Cuál es el comportamiento esperado?"
+  validations:
+    required: true
+
+- type: textarea
+  id: reproduction
+  attributes:
+    label: Pasos para reproducir
+    description: Pasos exactos para reproducir el bug
+    placeholder: |
+      1. ...
+      2. ...
+      3. ...
+  validations:
+    required: true
+
+- type: textarea
+  id: expected
+  attributes:
+    label: Comportamiento esperado
+    placeholder: "¿Qué debería pasar?"
+  validations:
+    required: true
+
+- type: textarea
+  id: actual
+  attributes:
+    label: Comportamiento actual
+    placeholder: "¿Qué realmente pasó?"
+  validations:
+    required: true
+
+- type: textarea
+  id: environment
+  attributes:
+    label: Entorno
+    value: |
+      - Node.js version: 
+      - PNPM version:
+      - OS: 
+      - Rama: 
+    validations:
+      required: true
+
+- type: textarea
+  id: logs
+  attributes:
+    label: Logs / Error Messages
+    description: Adjunta cualquier error o log relevante
+    render: bash
+
+- type: checkboxes
+  attributes:
+    label: Confirmaciones
+    options:
+    - label: Revisé issues existentes similares
+      required: true
+    - label: Este bug es reproducible
+      required: true
+    - label: Proporcioné suficiente información
+      required: true

@@ -1,0 +1,173 @@
+name: 📦 Release Management
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Release version (v0.0.0)'
+        required: true
+
+jobs:
+  # ============================================
+  # JOB 1: Create Release
+  # ============================================
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: '10'
+
+      - name: Get version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            VERSION=${{ github.event.inputs.version }}
+          else
+            VERSION=${GITHUB_REF#refs/tags/}
+          fi
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build application
+        run: pnpm run build
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          echo "## Release ${{ steps.version.outputs.version }}" > CHANGELOG_CURRENT.md
+          echo "" >> CHANGELOG_CURRENT.md
+          echo "### Changes" >> CHANGELOG_CURRENT.md
+          git log --oneline $(git describe --tags --abbrev=0 @^)..@ >> CHANGELOG_CURRENT.md 2>/dev/null || echo "- Initial release" >> CHANGELOG_CURRENT.md
+          cat CHANGELOG_CURRENT.md
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: Release ${{ steps.version.outputs.version }}
+          body_path: CHANGELOG_CURRENT.md
+          draft: false
+          prerelease: false
+
+      - name: Publish to npm (if needed)
+        run: |
+          echo "📦 Package publishing would go here"
+
+  # ============================================
+  # JOB 2: Generate Documentation
+  # ============================================
+  generate-docs:
+    name: Generate Documentation
+    runs-on: ubuntu-latest
+    needs: create-release
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2
+        with:
+          version: '10'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Generate API Documentation
+        run: |
+          echo "📚 Generating API documentation..."
+          # Ejemplo: pnpm run docs:generate
+          # npx compodoc -p tsconfig.json -d docs
+
+      - name: Commit documentation
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add docs/ || true
+          git commit -m "docs: update generated documentation for release" || true
+          git push
+
+  # ============================================
+  # JOB 3: Notificaciones
+  # ============================================
+  notify:
+    name: Release Notifications
+    runs-on: ubuntu-latest
+    needs: [create-release, generate-docs]
+    if: always()
+
+    steps:
+      - name: Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "📦 New Release",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "📦 VeganVita Backend - New Release"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Version:*\n${{ github.ref_name }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status:*\n✅ Released"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Release:* ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
+        if: success()
+
+      - name: GitHub Pages deployment (if applicable)
+        run: |
+          echo "📄 Documentation available at GitHub Pages"

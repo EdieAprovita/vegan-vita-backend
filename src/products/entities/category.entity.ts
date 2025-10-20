@@ -7,7 +7,6 @@ import {
   UpdateDateColumn,
   Index,
 } from 'typeorm';
-import { Product } from './product.entity';
 
 @Entity('categories')
 @Index(['slug'], { unique: true })
@@ -24,8 +23,8 @@ export class Category {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @OneToMany(() => Product, (product) => product.category)
-  products: Product[];
+  @OneToMany('Product', 'category')
+  products: any[];
 
   @CreateDateColumn()
   createdAt: Date;

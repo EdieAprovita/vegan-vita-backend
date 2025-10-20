@@ -1,0 +1,17 @@
+.dockerignore
+node_modules
+npm-debug.log
+pnpm-debug.log
+.git
+.gitignore
+README.md
+CHANGELOG.md
+.env
+.env.*
+dist
+coverage
+test
+.vscode
+.idea
+.DS_Store
+*.log
