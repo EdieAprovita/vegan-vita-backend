@@ -1,17 +1,16 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
 import { User } from './auth/entities/user.entity';
 import { Product, Category, Review } from './products/entities';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Hace que ConfigModule esté disponible globalmente
+      isGlobal: true,
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -24,8 +23,8 @@ import { Product, Category, Review } from './products/entities';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
         entities: [User, Product, Category, Review],
-        synchronize: true, // true en dev para auto-crear tablas, false en prod (usar migraciones)
-        logging: false, // Desabilitar logging para reducir ruido
+        synchronize: true,
+        logging: false,
         retryAttempts: 10,
         retryDelay: 3000,
         connectTimeoutMS: 10000,
@@ -34,7 +33,7 @@ import { Product, Category, Review } from './products/entities';
     AuthModule,
     ProductsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [HealthController],
+  providers: [],
 })
 export class AppModule {}
