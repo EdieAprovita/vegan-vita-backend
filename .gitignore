@@ -40,3 +40,5 @@ PROGRESO_PROYECTO.md
 !.vscode/extensions.json
 
 # Environments
+.env
+.env.*
