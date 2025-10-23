@@ -70,6 +70,14 @@ pnpm install
 
 ### 3️⃣ Configurar Variables de Entorno
 
+**Opción A: Usar template (Recomendado)**
+
+```bash
+cp env.template .env
+```
+
+**Opción B: Crear manualmente**
+
 Crear archivo `.env` en la raíz del proyecto:
 
 ```env
@@ -82,12 +90,20 @@ DB_NAME=vegan_vita_dev
 
 # JWT
 JWT_SECRET=vegan-vita-super-secret-key-change-in-production
-JWT_EXPIRES_IN=7d
+
+# Stripe (REQUERIDO)
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key_here
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key_here
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret_here
 
 # Server
 PORT=3001
 NODE_ENV=development
 ```
+
+⚠️ **IMPORTANTE**: Para obtener las credenciales de Stripe, consulta: [docs/STRIPE_SETUP.md](./docs/STRIPE_SETUP.md)
+
+🚨 **Fix Rápido**: Si ves el error `STRIPE_SECRET_KEY is required`, ve a: [docs/QUICK_FIX_STRIPE.md](./docs/QUICK_FIX_STRIPE.md)
 
 ### 4️⃣ Iniciar PostgreSQL con Docker
 

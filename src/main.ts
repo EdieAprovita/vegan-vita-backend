@@ -3,8 +3,11 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true, // Necesario para Stripe webhooks
+  });
   app.setGlobalPrefix('api'); // Prefijo para todos los endpoints
+  app.enableCors(); // Habilitar CORS
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // Elimina propiedades no definidas en el DTO
