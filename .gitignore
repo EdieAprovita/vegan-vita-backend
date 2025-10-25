@@ -38,3 +38,7 @@ PROGRESO_PROYECTO.md
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# Environments
+.env
+.env.*

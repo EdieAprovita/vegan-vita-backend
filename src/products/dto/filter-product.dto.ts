@@ -35,22 +35,22 @@ export class FilterProductDto {
   @Type(() => Number)
   @IsNumber()
   @Min(1)
-  page?: number = 1;
+  page?: number;
 
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
   @Min(1)
   @Max(100)
-  limit?: number = 10;
+  limit?: number;
 
   @IsOptional()
   @IsString()
   @IsIn(['name', 'price', 'createdAt'])
-  sortBy?: string = 'createdAt';
+  sortBy?: string;
 
   @IsOptional()
   @IsString()
   @IsIn(['ASC', 'DESC'])
-  sortOrder?: 'ASC' | 'DESC' = 'DESC';
+  sortOrder?: 'ASC' | 'DESC';
 }
