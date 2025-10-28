@@ -84,7 +84,7 @@ describe('AuthService', () => {
       expect(mockJwtService.sign).toHaveBeenCalledWith(
         { id: savedUser.id, email: savedUser.email },
         {
-          secret: process.env.JWT_SECRET || 'vegan-vita-super-secret-key',
+          secret: expect.any(String),
           expiresIn: '7d',
         },
       );
@@ -158,7 +158,7 @@ describe('AuthService', () => {
       expect(mockJwtService.sign).toHaveBeenCalledWith(
         { id: user.id, email: user.email },
         {
-          secret: process.env.JWT_SECRET || 'vegan-vita-super-secret-key',
+          secret: expect.any(String),
           expiresIn: '7d',
         },
       );

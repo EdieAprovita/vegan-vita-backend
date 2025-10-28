@@ -12,9 +12,10 @@ describe('ProductsService', () => {
   let mockProductRepository: any;
   let mockCategoryRepository: any;
   let mockReviewRepository: any;
+  let createMockQueryBuilder: () => any;
 
   beforeEach(async () => {
-    const mockQueryBuilder = {
+    createMockQueryBuilder = () => ({
       where: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
       orderBy: jest.fn().mockReturnThis(),
@@ -22,7 +23,7 @@ describe('ProductsService', () => {
       take: jest.fn().mockReturnThis(),
       leftJoinAndSelect: jest.fn().mockReturnThis(),
       getManyAndCount: jest.fn(),
-    };
+    });
 
     mockProductRepository = {
       find: jest.fn(),
@@ -30,7 +31,7 @@ describe('ProductsService', () => {
       create: jest.fn(),
       save: jest.fn(),
       remove: jest.fn(),
-      createQueryBuilder: jest.fn(() => mockQueryBuilder),
+      createQueryBuilder: jest.fn(),
     };
 
     mockCategoryRepository = {
@@ -96,17 +97,20 @@ describe('ProductsService', () => {
         },
       ];
 
-      const queryBuilder = mockProductRepository.createQueryBuilder();
-      queryBuilder.getManyAndCount.mockResolvedValue([products, 1]);
+      const mockQueryBuilder = createMockQueryBuilder();
+      mockProductRepository.createQueryBuilder.mockReturnValue(
+        mockQueryBuilder,
+      );
+      mockQueryBuilder.getManyAndCount.mockResolvedValue([products, 1]);
 
       const result = await service.findAll(filterDto);
 
       expect(mockProductRepository.createQueryBuilder).toHaveBeenCalled();
-      expect(queryBuilder.where).toHaveBeenCalled();
-      expect(queryBuilder.andWhere).toHaveBeenCalled();
-      expect(queryBuilder.orderBy).toHaveBeenCalled();
-      expect(queryBuilder.skip).toHaveBeenCalled();
-      expect(queryBuilder.take).toHaveBeenCalled();
+      expect(mockQueryBuilder.where).toHaveBeenCalled();
+      expect(mockQueryBuilder.andWhere).toHaveBeenCalled();
+      expect(mockQueryBuilder.orderBy).toHaveBeenCalled();
+      expect(mockQueryBuilder.skip).toHaveBeenCalled();
+      expect(mockQueryBuilder.take).toHaveBeenCalled();
       expect(result).toEqual({
         data: products,
         meta: {
@@ -125,8 +129,11 @@ describe('ProductsService', () => {
         { id: '2', name: 'Product 2' },
       ];
 
-      const queryBuilder = mockProductRepository.createQueryBuilder();
-      queryBuilder.getManyAndCount.mockResolvedValue([products, 2]);
+      const mockQueryBuilder = createMockQueryBuilder();
+      mockProductRepository.createQueryBuilder.mockReturnValue(
+        mockQueryBuilder,
+      );
+      mockQueryBuilder.getManyAndCount.mockResolvedValue([products, 2]);
 
       const result = await service.findAll(filterDto);
 
