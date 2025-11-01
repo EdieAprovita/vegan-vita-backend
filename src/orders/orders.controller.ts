@@ -9,6 +9,7 @@ import {
   Request,
   UseGuards,
   ParseIntPipe,
+  ParseUUIDPipe,
   DefaultValuePipe,
   ForbiddenException,
 } from '@nestjs/common';
@@ -38,7 +39,10 @@ export class OrdersController {
   }
 
   @Get(':id')
-  async getOrderById(@Param('id') id: string, @Request() req) {
+  async getOrderById(
+    @Param('id', new ParseUUIDPipe()) id: string,
+    @Request() req,
+  ) {
     const order = await this.ordersService.findOne(id);
 
     // Solo el dueño de la orden o un admin puede verla
@@ -53,7 +57,7 @@ export class OrdersController {
 
   @Put(':id/status')
   async updateOrderStatus(
-    @Param('id') id: string,
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,
     @Request() req,
   ) {
@@ -71,7 +75,7 @@ export class OrdersController {
 
   @Put(':id/deliver')
   @UseGuards(AdminGuard)
-  async markAsDelivered(@Param('id') id: string) {
+  async markAsDelivered(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.ordersService.markAsDelivered(id);
   }
 

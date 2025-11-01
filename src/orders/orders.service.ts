@@ -144,6 +144,7 @@ export class OrdersService {
   }
 
   async findOne(id: string): Promise<Order> {
+    // ParseUUIDPipe en el controller ya valida el UUID
     const order = await this.orderRepository.findOne({
       where: { id },
       relations: ['user', 'orderItems', 'orderItems.product'],

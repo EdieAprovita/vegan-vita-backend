@@ -284,11 +284,19 @@ jobs:
     steps:
       - name: Check CI Status
         run: |
+          echo "## 📊 CI Job Results"
+          echo "Lint result: ${{ needs.lint.result }}"
+          echo "Build result: ${{ needs.build.result }}"
+          echo "Unit Tests result: ${{ needs.test-unit.result }}"
+          echo "E2E Tests result: ${{ needs.test-e2e.result }}"
+          echo "Security result: ${{ needs.security.result }}"
+          echo ""
           if [ "${{ needs.lint.result }}" == "failure" ] || \
              [ "${{ needs.build.result }}" == "failure" ] || \
              [ "${{ needs.test-unit.result }}" == "failure" ] || \
-             [ "${{ needs.test-e2e.result }}" == "failure" ]; then
-            echo "❌ CI Pipeline failed"
+             [ "${{ needs.test-e2e.result }}" == "failure" ] || \
+             [ "${{ needs.security.result }}" == "failure" ]; then
+            echo "❌ CI Pipeline failed — see above for which jobs failed"
             exit 1
           else
             echo "✅ CI Pipeline passed"
