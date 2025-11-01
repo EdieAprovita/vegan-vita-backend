@@ -196,8 +196,6 @@ jobs:
           --health-timeout=5s
           --health-retries=10
           --health-start-period=10s
-        ports:
-          - 5432:5432
 
     steps:
       - name: Checkout
@@ -235,15 +233,15 @@ jobs:
       - name: Wait for PostgreSQL
         run: |
           echo "⏳ Waiting for PostgreSQL to be fully ready..."
-          for i in {1..30}; do
-            if pg_isready -h localhost -p 5432 -U postgres > /dev/null 2>&1; then
+          for i in {1..60}; do
+            if pg_isready -h postgres -p 5432 -U postgres -d vegan_vita_test > /dev/null 2>&1; then
               echo "✅ PostgreSQL is accepting connections"
               echo "⏳ Waiting additional 3 seconds for full initialization..."
               sleep 3
               echo "✅ PostgreSQL is ready!"
               exit 0
             fi
-            echo "⏳ Attempt $i/30: PostgreSQL not ready yet..."
+            echo "⏳ Attempt $i/60: PostgreSQL not ready yet..."
             sleep 2
           done
           echo "❌ PostgreSQL did not become ready in time"
@@ -252,7 +250,7 @@ jobs:
       - name: Test Database Connection
         run: |
           echo "🔌 Testing database connection..."
-          PGPASSWORD=postgres psql -h localhost -U postgres -d vegan_vita_test -c "SELECT version();" || {
+          PGPASSWORD=postgres psql -h postgres -p 5432 -U postgres -d vegan_vita_test -c "SELECT version();" || {
             echo "❌ Failed to connect to database"
             exit 1
           }
@@ -261,12 +259,12 @@ jobs:
       - name: Run E2E Tests
         run: pnpm run test:e2e
         env:
-          DB_HOST: localhost
+          DB_HOST: postgres
           DB_PORT: 5432
           DB_USER: postgres
           DB_PASSWORD: postgres
           DB_NAME: vegan_vita_test
-          JWT_SECRET: vegan-vita-super-secret-key
+          JWT_SECRET: vegan-vita-super-secret-key-for-testing-ci-min-32-characters
           JWT_EXPIRES_IN: 7d
           NODE_ENV: test
           SMTP_HOST: smtp.test.com
