@@ -2,22 +2,40 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from './notifications.service';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
+import * as fs from 'fs';
 import { Order } from '../orders/entities/order.entity';
 import { OrderStatus } from '../orders/entities/order-status.enum';
 
 jest.mock('nodemailer');
+jest.mock('fs');
 
 describe('NotificationsService', () => {
   let service: NotificationsService;
   let mockConfigService: Partial<ConfigService>;
   let mockTransporter: any;
+  let originalNodeEnv: string | undefined;
 
   beforeEach(async () => {
+    // Save original NODE_ENV
+    originalNodeEnv = process.env.NODE_ENV;
+    // Set to non-test environment to allow email sending in tests
+    process.env.NODE_ENV = 'development';
+
     mockTransporter = {
       sendMail: jest.fn().mockResolvedValue({ messageId: 'test-id' }),
     };
 
     (nodemailer.createTransport as jest.Mock).mockReturnValue(mockTransporter);
+
+    // Mock fs.readFileSync to return a simple template
+    (fs.readFileSync as jest.Mock).mockReturnValue(`
+      <html>
+        <body>
+          <h1>{{userName}}</h1>
+          <p>{{orderId}}</p>
+        </body>
+      </html>
+    `);
 
     mockConfigService = {
       get: jest.fn((key: string) => {
@@ -47,6 +65,8 @@ describe('NotificationsService', () => {
   });
 
   afterEach(() => {
+    // Restore original NODE_ENV
+    process.env.NODE_ENV = originalNodeEnv;
     jest.clearAllMocks();
   });
 
