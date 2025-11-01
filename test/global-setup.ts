@@ -7,7 +7,7 @@ export default async function globalSetup() {
   console.log('\n🔄 Initializing E2E Test Environment...\n');
 
   // Load .env.test file for E2E tests (local development)
-  // En CI/CD, las variables de entorno se pasan directamente
+  // In CI/CD, environment variables are passed directly
   const envTestPath = join(__dirname, '..', '.env.test');
 
   if (existsSync(envTestPath)) {
@@ -21,7 +21,7 @@ export default async function globalSetup() {
     console.log('ℹ️ Using environment variables from CI/CD');
   }
 
-  // Verificar variables de entorno críticas
+  // Verify critical environment variables
   const requiredEnvVars = [
     'DB_HOST',
     'DB_PORT',
@@ -42,7 +42,7 @@ export default async function globalSetup() {
 
   console.log('✅ All required environment variables present');
 
-  // Crear conexión de prueba a la base de datos
+  // Create test database connection
   const dataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST,
@@ -56,7 +56,7 @@ export default async function globalSetup() {
     console.log('🔌 Testing database connection...');
     await dataSource.initialize();
 
-    // Verificar que podemos hacer queries
+    // Verify that we can execute queries
     const result = await dataSource.query('SELECT version()');
     console.log('✅ Database connection successful');
     console.log(

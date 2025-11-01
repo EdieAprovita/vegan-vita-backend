@@ -45,7 +45,7 @@ export class OrdersController {
   ) {
     const order = await this.ordersService.findOne(id);
 
-    // Solo el dueño de la orden o un admin puede verla
+    // Only the order owner or an admin can view it
     if (order.userId !== req.user.id && !req.user.isAdmin) {
       throw new ForbiddenException(
         'No tienes permiso para acceder a esta orden',
@@ -63,7 +63,7 @@ export class OrdersController {
   ) {
     const order = await this.ordersService.findOne(id);
 
-    // Solo el dueño de la orden o un admin pueden actualizar el estado
+    // Only the order owner or an admin can update the status
     if (order.userId !== req.user.id && !req.user.isAdmin) {
       throw new ForbiddenException(
         'No tienes permiso para actualizar esta orden',

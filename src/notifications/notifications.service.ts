@@ -52,7 +52,9 @@ export class NotificationsService {
     try {
       // Skip sending emails in test environment
       if (process.env.NODE_ENV === 'test') {
-        this.logger.log(`[TEST] Skipping email: Order confirmation for ${order.id}`);
+        this.logger.log(
+          `[TEST] Skipping email: Order confirmation for ${order.id}`,
+        );
         return;
       }
 
@@ -156,7 +158,9 @@ export class NotificationsService {
     try {
       // Skip sending emails in test environment
       if (process.env.NODE_ENV === 'test') {
-        this.logger.log(`[TEST] Skipping email: Delivery confirmation for ${order.id}`);
+        this.logger.log(
+          `[TEST] Skipping email: Delivery confirmation for ${order.id}`,
+        );
         return;
       }
 
@@ -241,7 +245,7 @@ export class NotificationsService {
   }
 
   async sendWebhookNotification(event: string, order: Order): Promise<void> {
-    // Implementación de webhooks para integraciones externas
+    // Webhook implementation for external integrations
     const webhookUrl = this.configService.get<string>('WEBHOOK_URL');
 
     if (!webhookUrl) {

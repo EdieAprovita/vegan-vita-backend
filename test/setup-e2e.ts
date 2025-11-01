@@ -3,7 +3,7 @@ import { join } from 'path';
 import { existsSync } from 'fs';
 
 // Load .env.test file for E2E tests (local development)
-// En CI/CD, las variables de entorno se pasan directamente
+// In CI/CD, environment variables are passed directly
 const envTestPath = join(__dirname, '..', '.env.test');
 
 if (existsSync(envTestPath)) {

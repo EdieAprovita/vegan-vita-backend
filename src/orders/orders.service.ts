@@ -36,7 +36,7 @@ export class OrdersService {
     await queryRunner.startTransaction();
 
     try {
-      // Validar productos y stock
+      // Validate products and stock
       const orderItems: Partial<OrderItem>[] = [];
       let itemsPrice = 0;
 
@@ -57,15 +57,15 @@ export class OrdersService {
           );
         }
 
-        // Reducir stock
+        // Reduce stock
         product.stock -= item.qty;
         await queryRunner.manager.save(Product, product);
 
-        // Calcular precio
+        // Calculate price
         const itemPrice = Number(product.price) * item.qty;
         itemsPrice += itemPrice;
 
-        // Crear order item (snapshot del producto)
+        // Create order item (product snapshot)
         orderItems.push({
           name: product.name,
           qty: item.qty,
@@ -75,12 +75,12 @@ export class OrdersService {
         });
       }
 
-      // Calcular totales
+      // Calculate totals
       const shippingPrice = createOrderDto.shippingPrice || 0;
       const taxPrice = createOrderDto.taxPrice || 0;
       const totalPrice = itemsPrice + shippingPrice + taxPrice;
 
-      // Crear orden
+      // Create order
       const order = queryRunner.manager.create(Order, {
         userId,
         shippingAddress: createOrderDto.shippingAddress,
@@ -94,7 +94,7 @@ export class OrdersService {
 
       const savedOrder = await queryRunner.manager.save(Order, order);
 
-      // Crear order items
+      // Create order items
       for (const item of orderItems) {
         const orderItem = queryRunner.manager.create(OrderItem, {
           ...item,
@@ -105,13 +105,13 @@ export class OrdersService {
 
       await queryRunner.commitTransaction();
 
-      // Obtener la orden completa con relaciones
+      // Get the complete order with relations
       const completeOrder = await this.orderRepository.findOne({
         where: { id: savedOrder.id },
         relations: ['user', 'orderItems', 'orderItems.product'],
       });
 
-      // Enviar notificaciones
+      // Send notifications
       try {
         await this.notificationsService.sendOrderConfirmation(completeOrder);
         await this.notificationsService.sendWebhookNotification(

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax */
 import { NestFactory } from '@nestjs/core';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -37,7 +38,6 @@ async function seed() {
     },
   ];
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const userData of users) {
     const exists = await userRepo.findOne({ where: { email: userData.email } });
     if (exists) {
@@ -76,7 +76,6 @@ async function seed() {
   ];
 
   const categoryMap = new Map<string, Category>();
-  // eslint-disable-next-line no-restricted-syntax
   for (const categoryData of categories) {
     let category = await categoryRepo.findOne({
       where: { slug: categoryData.slug },
@@ -168,7 +167,6 @@ async function seed() {
     },
   ];
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const productData of products) {
     const exists = await productRepo.findOne({
       where: { slug: productData.slug },
