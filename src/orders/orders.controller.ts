@@ -13,7 +13,12 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDto, UpdateOrderStatusDto } from './dto';
+import {
+  CreateOrderDto,
+  UpdateOrderStatusDto,
+  PaginatedOrdersResponse,
+} from './dto';
+import { Order } from './entities';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 
@@ -73,9 +78,15 @@ export class OrdersController {
   @Get()
   @UseGuards(AdminGuard)
   async getAllOrders(
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
-    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
-  ) {
-    return this.ordersService.findAll(page, limit);
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit = 10,
+  ): Promise<PaginatedOrdersResponse<Order>> {
+    const { data, metadata } = await this.ordersService.findAll(page, limit);
+    return {
+      orders: data,
+      total: metadata.total,
+      page: metadata.page,
+      totalPages: metadata.totalPages,
+    };
   }
 }

@@ -7,8 +7,6 @@ import { AppModule } from '../src/app.module';
 import { User } from '../src/auth/entities/user.entity';
 import { Product } from '../src/products/entities/product.entity';
 import { Category } from '../src/products/entities/category.entity';
-import { Order } from '../src/orders/entities/order.entity';
-import { OrderItem } from '../src/orders/entities/order-item.entity';
 import { OrderStatus } from '../src/orders/entities/order-status.enum';
 
 describe('Orders System (e2e)', () => {
@@ -17,7 +15,6 @@ describe('Orders System (e2e)', () => {
   let userToken: string;
   let adminToken: string;
   let testUser: User;
-  let testAdmin: User;
   let testProduct: Product;
   let testCategory: Category;
 
@@ -77,7 +74,7 @@ describe('Orders System (e2e)', () => {
       isAdmin: false,
     });
 
-    testAdmin = await userRepo.save({
+    await userRepo.save({
       name: 'Test Admin',
       email: 'admin@example.com',
       password: await bcrypt.hash('Admin123!', 10),
@@ -280,7 +277,7 @@ describe('Orders System (e2e)', () => {
     it('should fail for non-owner user', async () => {
       // Create another user
       const userRepo = dataSource.getRepository(User);
-      const otherUser = await userRepo.save({
+      await userRepo.save({
         name: 'Other User',
         email: 'other@example.com',
         password: await bcrypt.hash('Test123!', 10),
@@ -399,7 +396,7 @@ describe('Orders System (e2e)', () => {
 
     it('should mark order as delivered (admin)', async () => {
       const response = await request(app.getHttpServer())
-        .put(`/orders/${testOrderId}/deliver`)
+        .put(`/api/orders/${testOrderId}/deliver`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
 
@@ -410,14 +407,14 @@ describe('Orders System (e2e)', () => {
 
     it('should fail for non-admin user', async () => {
       await request(app.getHttpServer())
-        .put(`/orders/${testOrderId}/deliver`)
+        .put(`/api/orders/${testOrderId}/deliver`)
         .set('Authorization', `Bearer ${userToken}`)
         .expect(403);
     });
 
     it('should fail without authentication', async () => {
       await request(app.getHttpServer())
-        .put(`/orders/${testOrderId}/deliver`)
+        .put(`/api/orders/${testOrderId}/deliver`)
         .expect(401);
     });
   });
@@ -496,7 +493,7 @@ describe('Orders System (e2e)', () => {
 
       // 2. Update to processing
       const processingResponse = await request(app.getHttpServer())
-        .put(`/orders/${orderId}/status`)
+        .put(`/api/orders/${orderId}/status`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ status: OrderStatus.PROCESSING })
         .expect(200);
@@ -504,7 +501,7 @@ describe('Orders System (e2e)', () => {
 
       // 3. Mark as paid
       const paidResponse = await request(app.getHttpServer())
-        .put(`/orders/${orderId}/status`)
+        .put(`/api/orders/${orderId}/status`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ status: OrderStatus.PAID })
         .expect(200);
@@ -512,7 +509,7 @@ describe('Orders System (e2e)', () => {
 
       // 4. Mark as shipped
       const shippedResponse = await request(app.getHttpServer())
-        .put(`/orders/${orderId}/status`)
+        .put(`/api/orders/${orderId}/status`)
         .set('Authorization', `Bearer ${adminToken}`)
         .send({ status: OrderStatus.SHIPPED })
         .expect(200);
@@ -520,7 +517,7 @@ describe('Orders System (e2e)', () => {
 
       // 5. Mark as delivered
       const deliveredResponse = await request(app.getHttpServer())
-        .put(`/orders/${orderId}/deliver`)
+        .put(`/api/orders/${orderId}/deliver`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
       expect(deliveredResponse.body.status).toBe(OrderStatus.DELIVERED);
@@ -529,7 +526,7 @@ describe('Orders System (e2e)', () => {
 
       // 6. Verify final state
       const finalResponse = await request(app.getHttpServer())
-        .get(`/orders/${orderId}`)
+        .get(`/api/orders/${orderId}`)
         .set('Authorization', `Bearer ${userToken}`)
         .expect(200);
 

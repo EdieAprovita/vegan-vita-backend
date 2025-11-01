@@ -247,10 +247,16 @@ export class NotificationsService {
       };
 
       // Aquí se implementaría el envío real del webhook
-      // Por ejemplo, usando fetch o axios
+      // Por ejemplo, usando fetch o axios:
+      // await fetch(process.env.WEBHOOK_URL, {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(payload),
+      // });
       this.logger.log(
         `Webhook notification sent for event: ${event}, order: ${order.id}`,
       );
+      this.logger.debug('Webhook payload:', JSON.stringify(payload));
     } catch (error) {
       this.logger.error(
         `Failed to send webhook notification: ${error.message}`,

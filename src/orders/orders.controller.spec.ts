@@ -268,8 +268,8 @@ describe('OrdersController', () => {
       const result = await controller.getAllOrders(1, 10);
 
       expect(mockOrdersService.findAll).toHaveBeenCalledWith(1, 10);
-      expect(result.data).toHaveLength(2);
-      expect(result.metadata.total).toBe(2);
+      expect(result.orders).toHaveLength(2);
+      expect(result.total).toBe(2);
     });
 
     it('should handle pagination correctly', async () => {
@@ -287,8 +287,8 @@ describe('OrdersController', () => {
       const result = await controller.getAllOrders(2, 10);
 
       expect(mockOrdersService.findAll).toHaveBeenCalledWith(2, 10);
-      expect(result.metadata.page).toBe(2);
-      expect(result.metadata.totalPages).toBe(3);
+      expect(result.page).toBe(2);
+      expect(result.totalPages).toBe(3);
     });
 
     it('should use default pagination values', async () => {

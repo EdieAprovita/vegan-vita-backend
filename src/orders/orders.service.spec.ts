@@ -4,11 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Order, OrderItem, OrderStatus } from './entities';
 import { Product } from '../products/entities/product.entity';
 import { NotificationsService } from '../notifications/notifications.service';
-import {
-  NotFoundException,
-  BadRequestException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 
 describe('OrdersService', () => {
@@ -324,7 +320,7 @@ describe('OrdersService', () => {
         status: OrderStatus.PAID,
       });
 
-      const result = await service.updateStatus('order-1', {
+      await service.updateStatus('order-1', {
         status: OrderStatus.PAID,
       });
 
@@ -380,7 +376,7 @@ describe('OrdersService', () => {
         status: OrderStatus.DELIVERED,
       });
 
-      const result = await service.markAsDelivered('order-1');
+      await service.markAsDelivered('order-1');
 
       expect(mockOrder.isDelivered).toBe(true);
       expect(mockOrder.deliveredAt).toBeInstanceOf(Date);
@@ -437,7 +433,6 @@ describe('OrdersService', () => {
   describe('validateOwnership', () => {
     it('should allow owner to access their order', async () => {
       const mockOrder = { id: 'order-1', userId: 'user-1' };
-      const mockUser = { id: 'user-1', isAdmin: false };
 
       mockOrderRepository.findOne.mockResolvedValue(mockOrder as any);
 

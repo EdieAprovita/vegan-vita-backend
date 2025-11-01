@@ -8,7 +8,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Order, OrderItem, OrderStatus } from './entities';
 import { Product } from '../products/entities/product.entity';
-import { CreateOrderDto, UpdateOrderStatusDto } from './dto';
+import {
+  CreateOrderDto,
+  UpdateOrderStatusDto,
+  PaginationMetadata,
+} from './dto';
 import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
@@ -153,9 +157,9 @@ export class OrdersService {
   }
 
   async findAll(
-    page: number = 1,
-    limit: number = 10,
-  ): Promise<{ data: Order[]; metadata: any }> {
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Order[]; metadata: PaginationMetadata }> {
     const skip = (page - 1) * limit;
 
     const [data, total] = await Promise.all([
