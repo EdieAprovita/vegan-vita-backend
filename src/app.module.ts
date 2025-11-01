@@ -3,8 +3,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
+import { OrdersModule } from './orders/orders.module';
 import { User } from './auth/entities/user.entity';
 import { Product, Category, Review } from './products/entities';
+import { Order, OrderItem } from './orders/entities';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -22,7 +24,7 @@ import { HealthController } from './health.controller';
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User, Product, Category, Review],
+        entities: [User, Product, Category, Review, Order, OrderItem],
         synchronize: true,
         logging: false,
         retryAttempts: 10,
@@ -32,6 +34,7 @@ import { HealthController } from './health.controller';
     }),
     AuthModule,
     ProductsModule,
+    OrdersModule,
   ],
   controllers: [HealthController],
   providers: [],
