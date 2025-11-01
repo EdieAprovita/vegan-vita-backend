@@ -94,7 +94,7 @@ describe('AuthService', () => {
           email: savedUser.email,
           name: savedUser.name,
         },
-        token: 'jwt-token',
+        access_token: 'jwt-token',
       });
     });
 
@@ -168,7 +168,7 @@ describe('AuthService', () => {
           email: user.email,
           name: user.name,
         },
-        token: 'jwt-token',
+        access_token: 'jwt-token',
       });
     });
 
