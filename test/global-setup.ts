@@ -1,7 +1,25 @@
 import { DataSource } from 'typeorm';
+import * as dotenv from 'dotenv';
+import { join } from 'path';
+import { existsSync } from 'fs';
 
 export default async function globalSetup() {
   console.log('\n🔄 Initializing E2E Test Environment...\n');
+
+  // Load .env.test file for E2E tests (local development)
+  // En CI/CD, las variables de entorno se pasan directamente
+  const envTestPath = join(__dirname, '..', '.env.test');
+
+  if (existsSync(envTestPath)) {
+    const result = dotenv.config({ path: envTestPath });
+    if (result.error) {
+      console.warn('⚠️ Could not load .env.test:', result.error.message);
+    } else {
+      console.log('✅ Loaded .env.test file');
+    }
+  } else {
+    console.log('ℹ️ Using environment variables from CI/CD');
+  }
 
   // Verificar variables de entorno críticas
   const requiredEnvVars = [

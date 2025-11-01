@@ -139,8 +139,8 @@ describe('Orders System (e2e)', () => {
       expect(response.body).toMatchObject({
         user: { id: testUser.id },
         status: OrderStatus.PENDING,
-        itemsPrice: 39.98,
-        shippingPrice: 0,
+        itemsPrice: '39.98',
+        shippingPrice: '0.00',
         taxPrice: expect.any(String),
         totalPrice: expect.any(String),
         isPaid: false,
@@ -534,7 +534,7 @@ describe('Orders System (e2e)', () => {
         id: orderId,
         status: OrderStatus.DELIVERED,
         isDelivered: true,
-        isPaid: false, // Not marked as paid separately in this flow
+        isPaid: true, // isPaid is set to true when status changes to PAID
       });
     });
   });

@@ -37,10 +37,12 @@ export class Order extends BaseEntity {
 
   @Column({ type: 'jsonb' })
   shippingAddress: {
+    fullName: string;
     address: string;
     city: string;
     postalCode: string;
     country: string;
+    phone?: string;
   };
 
   @Column({ type: 'varchar', length: 50 })

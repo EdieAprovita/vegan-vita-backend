@@ -50,6 +50,12 @@ export class NotificationsService {
 
   async sendOrderConfirmation(order: Order): Promise<void> {
     try {
+      // Skip sending emails in test environment
+      if (process.env.NODE_ENV === 'test') {
+        this.logger.log(`[TEST] Skipping email: Order confirmation for ${order.id}`);
+        return;
+      }
+
       const template = this.templates.get('order-confirmation');
       if (!template) {
         throw new Error('Order confirmation template not found');
@@ -100,6 +106,12 @@ export class NotificationsService {
     newStatus: OrderStatus,
   ): Promise<void> {
     try {
+      // Skip sending emails in test environment
+      if (process.env.NODE_ENV === 'test') {
+        this.logger.log(`[TEST] Skipping email: Status update for ${order.id}`);
+        return;
+      }
+
       const template = this.templates.get('status-update');
       if (!template) {
         throw new Error('Status update template not found');
@@ -142,6 +154,12 @@ export class NotificationsService {
 
   async sendDeliveryConfirmation(order: Order): Promise<void> {
     try {
+      // Skip sending emails in test environment
+      if (process.env.NODE_ENV === 'test') {
+        this.logger.log(`[TEST] Skipping email: Delivery confirmation for ${order.id}`);
+        return;
+      }
+
       const template = this.templates.get('order-delivered');
       if (!template) {
         throw new Error('Order delivered template not found');

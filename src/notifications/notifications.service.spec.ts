@@ -137,10 +137,12 @@ describe('NotificationsService', () => {
           } as any,
         ],
         shippingAddress: {
+          fullName: 'John Doe',
           address: '123 Main St',
           city: 'New York',
           postalCode: '10001',
           country: 'USA',
+          phone: '+1 234567890',
         },
         paymentMethod: 'PayPal',
         itemsPrice: 21.98,
@@ -203,10 +205,12 @@ describe('NotificationsService', () => {
           updatedAt: new Date(),
         },
         shippingAddress: {
+          fullName: 'John Doe',
           address: '123 Main St',
           city: 'New York',
           postalCode: '10001',
           country: 'USA',
+          phone: '+1 234567890',
         },
         deliveredAt: new Date(),
       } as Order;

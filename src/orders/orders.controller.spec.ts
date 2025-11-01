@@ -79,10 +79,12 @@ describe('OrdersController', () => {
     const createOrderDto: CreateOrderDto = {
       orderItems: [{ productId: 'prod-1', qty: 2 }],
       shippingAddress: {
+        fullName: 'John Doe',
         address: '123 Main St',
         city: 'New York',
         postalCode: '10001',
         country: 'USA',
+        phone: '+1 234567890',
       },
       paymentMethod: 'PayPal',
       shippingPrice: 10,

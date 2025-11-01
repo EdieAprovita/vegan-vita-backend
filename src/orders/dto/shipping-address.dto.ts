@@ -4,9 +4,16 @@ import {
   MinLength,
   MaxLength,
   Matches,
+  IsOptional,
 } from 'class-validator';
 
 export class ShippingAddressDto {
+  @IsString()
+  @IsNotEmpty({ message: 'El nombre completo es requerido' })
+  @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres' })
+  @MaxLength(100, { message: 'El nombre no puede exceder 100 caracteres' })
+  fullName: string;
+
   @IsString()
   @IsNotEmpty({ message: 'La dirección es requerida' })
   @MinLength(5, { message: 'La dirección debe tener al menos 5 caracteres' })
@@ -32,4 +39,11 @@ export class ShippingAddressDto {
   @MinLength(2, { message: 'El país debe tener al menos 2 caracteres' })
   @MaxLength(100, { message: 'El país no puede exceder 100 caracteres' })
   country: string;
+
+  @IsString()
+  @IsOptional()
+  @Matches(/^\+?[\d\s-()]{8,20}$/, {
+    message: 'El teléfono debe tener un formato válido',
+  })
+  phone?: string;
 }
