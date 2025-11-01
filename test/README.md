@@ -17,16 +17,19 @@ CREATE DATABASE vegan_vita_test;
 \q
 ```
 
-### 2. Configurar Variables de Entorno
+### 2. Configurar Variables de Entorno (Solo para desarrollo local)
 
-El archivo `.env.test` en la raíz del proyecto ya está configurado con:
-
-```env
-DB_NAME=vegan_vita_test
-JWT_SECRET=vegan-vita-super-secret-key
+```bash
+# Copiar el archivo de ejemplo
+cp .env.test.example .env.test
 ```
 
-**IMPORTANTE**: El `JWT_SECRET` debe coincidir con el que usa tu aplicación para que los tokens JWT funcionen correctamente en los tests.
+El archivo `.env.test` está configurado con los valores correctos. **No necesitas modificarlo** a menos que uses credenciales diferentes de PostgreSQL.
+
+**IMPORTANTE**: 
+- En **desarrollo local**: Los tests usan el archivo `.env.test`
+- En **CI/CD**: Las variables de entorno se pasan directamente en el workflow
+- El `JWT_SECRET` debe ser `vegan-vita-super-secret-key` para que coincida con el default del código
 
 ### 3. Ejecutar los Tests E2E
 

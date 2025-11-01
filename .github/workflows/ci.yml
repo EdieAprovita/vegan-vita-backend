@@ -229,8 +229,15 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: postgres
           DB_NAME: vegan_vita_test
-          JWT_SECRET: test-secret-key
+          JWT_SECRET: vegan-vita-super-secret-key
+          JWT_EXPIRES_IN: 7d
           NODE_ENV: test
+          SMTP_HOST: smtp.test.com
+          SMTP_PORT: 587
+          SMTP_USER: test@test.com
+          SMTP_PASS: test-password
+          SMTP_FROM: "VeganVita Test <noreply@test.com>"
+          FRONTEND_URL: http://localhost:3001
 
   # ============================================
   # JOB 6: Análisis de Dependencias
