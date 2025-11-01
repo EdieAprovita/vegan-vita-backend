@@ -80,6 +80,7 @@ describe('NotificationsService', () => {
           } as any,
         ],
         shippingAddress: {
+          fullName: 'John Doe',
           address: '123 Main St',
           city: 'New York',
           postalCode: '10001',
