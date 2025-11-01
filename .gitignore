@@ -42,3 +42,5 @@ PROGRESO_PROYECTO.md
 # Environments
 .env
 .env.*
+!.env.test.ci
+!.env.test.example

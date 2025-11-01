@@ -8,11 +8,17 @@ import { User } from './auth/entities/user.entity';
 import { Product, Category, Review } from './products/entities';
 import { Order, OrderItem } from './orders/entities';
 import { HealthController } from './health.controller';
+import { validationSchema } from './config/env.validation';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validationSchema: validationSchema,
+      validationOptions: {
+        allowUnknown: true,
+        abortEarly: false, // Mostrar todos los errores, no solo el primero
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
