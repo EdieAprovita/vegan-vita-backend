@@ -190,6 +190,8 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: vegan_vita_test
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd="pg_isready -U postgres -d vegan_vita_test"
           --health-interval=5s
@@ -239,7 +241,7 @@ jobs:
         run: |
           echo "⏳ Waiting for PostgreSQL to be fully ready..."
           for i in {1..60}; do
-            if pg_isready -h postgres -p 5432 -U postgres -d vegan_vita_test > /dev/null 2>&1; then
+            if pg_isready -h localhost -p 5432 -U postgres -d vegan_vita_test > /dev/null 2>&1; then
               echo "✅ PostgreSQL is accepting connections"
               echo "⏳ Waiting additional 3 seconds for full initialization..."
               sleep 3
@@ -255,7 +257,7 @@ jobs:
       - name: Test Database Connection
         run: |
           echo "🔌 Testing database connection..."
-          PGPASSWORD=postgres psql -h postgres -p 5432 -U postgres -d vegan_vita_test -c "SELECT version();" || {
+          PGPASSWORD=postgres psql -h localhost -p 5432 -U postgres -d vegan_vita_test -c "SELECT version();" || {
             echo "❌ Failed to connect to database"
             exit 1
           }
@@ -264,7 +266,7 @@ jobs:
       - name: Run E2E Tests
         run: pnpm run test:e2e
         env:
-          DB_HOST: postgres
+          DB_HOST: localhost
           DB_PORT: 5432
           DB_USER: postgres
           DB_PASSWORD: postgres
