@@ -50,12 +50,18 @@ export class NotificationsService {
           error.code === 'ENOENT'
             ? `File not found: ${file}`
             : `Failed to read file: ${error.message}`;
+        // Always log full details for debugging
         this.logger.error(
           `Failed to load email template: ${file} - ${errorMessage}`,
         );
-        throw new Error(
-          `Email template initialization failed: ${file} - ${errorMessage}`,
-        );
+        // In production, throw a generic error message
+        if (process.env.NODE_ENV === 'production') {
+          throw new Error('Email template initialization failed.');
+        } else {
+          throw new Error(
+            `Email template initialization failed: ${file} - ${errorMessage}`,
+          );
+        }
       }
     });
 
