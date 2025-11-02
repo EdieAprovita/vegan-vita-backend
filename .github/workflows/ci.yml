@@ -240,15 +240,15 @@ jobs:
       - name: Wait for PostgreSQL
         run: |
           echo "⏳ Waiting for PostgreSQL to be fully ready..."
-          for i in {1..60}; do
+          for i in {1..15}; do
             if pg_isready -h localhost -p 5432 -U postgres -d vegan_vita_test > /dev/null 2>&1; then
               echo "✅ PostgreSQL is accepting connections"
-              echo "⏳ Waiting additional 3 seconds for full initialization..."
-              sleep 3
+              echo "⏳ Waiting additional 1 second for full initialization..."
+              sleep 1
               echo "✅ PostgreSQL is ready!"
               exit 0
             fi
-            echo "⏳ Attempt $i/60: PostgreSQL not ready yet..."
+            echo "⏳ Attempt $i/15: PostgreSQL not ready yet..."
             sleep 2
           done
           echo "❌ PostgreSQL did not become ready in time"
