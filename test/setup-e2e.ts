@@ -14,6 +14,6 @@ if (existsSync(envTestPath)) {
     console.log('✓ E2E environment loaded from .env.test');
   }
 } else {
-  // En CI/CD, las variables de entorno ya están configuradas
+  // In CI/CD, environment variables are already configured
   console.log('ℹ️ Using environment variables from CI/CD');
 }

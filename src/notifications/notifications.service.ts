@@ -268,8 +268,8 @@ export class NotificationsService {
         },
       };
 
-      // Aquí se implementaría el envío real del webhook
-      // Por ejemplo, usando fetch o axios:
+      // Actual webhook sending would be implemented here
+      // For example, using fetch or axios:
       // await fetch(process.env.WEBHOOK_URL, {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },

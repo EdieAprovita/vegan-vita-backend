@@ -41,7 +41,7 @@ async function seed() {
   for (const userData of users) {
     const exists = await userRepo.findOne({ where: { email: userData.email } });
     if (exists) {
-      console.log(`⏭️  Usuario ya existe: ${userData.email}`);
+      console.log(`⏭️  User already exists: ${userData.email}`);
     } else {
       await userRepo.save(userData);
       console.log(

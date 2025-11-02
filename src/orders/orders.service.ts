@@ -144,7 +144,7 @@ export class OrdersService {
   }
 
   async findOne(id: string): Promise<Order> {
-    // ParseUUIDPipe en el controller ya valida el UUID
+    // ParseUUIDPipe in the controller already validates the UUID
     const order = await this.orderRepository.findOne({
       where: { id },
       relations: ['user', 'orderItems', 'orderItems.product'],
@@ -200,7 +200,7 @@ export class OrdersService {
     const oldStatus = order.status;
     order.status = updateOrderStatusDto.status;
 
-    // Si el estado es PAID, marcar como pagado
+    // If the status is PAID, mark as paid
     if (updateOrderStatusDto.status === OrderStatus.PAID) {
       order.isPaid = true;
       order.paidAt = new Date();
