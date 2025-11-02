@@ -45,7 +45,7 @@ async function seed() {
     } else {
       await userRepo.save(userData);
       console.log(
-        `✅ Usuario creado: ${userData.email} ${userData.isAdmin ? '(Admin)' : ''}`,
+        `✅ User created: ${userData.email} ${userData.isAdmin ? '(Admin)' : ''}`,
       );
     }
   }

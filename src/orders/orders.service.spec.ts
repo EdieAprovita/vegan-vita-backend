@@ -184,7 +184,7 @@ describe('OrdersService', () => {
         BadRequestException,
       );
       await expect(service.create(createOrderDto, mockUser.id)).rejects.toThrow(
-        'Producto prod-1 no encontrado',
+        'Product prod-1 not found',
       );
 
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
@@ -201,7 +201,7 @@ describe('OrdersService', () => {
         BadRequestException,
       );
       await expect(service.create(createOrderDto, mockUser.id)).rejects.toThrow(
-        'Stock insuficiente',
+        'Insufficient stock',
       );
 
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
@@ -299,7 +299,7 @@ describe('OrdersService', () => {
         NotFoundException,
       );
       await expect(service.findOne('nonexistent')).rejects.toThrow(
-        'Orden no encontrada',
+        'Order not found',
       );
     });
   });

@@ -42,11 +42,17 @@ export default async function globalSetup() {
 
   console.log('✅ All required environment variables present');
 
+  // Validate DB_PORT
+  const port = parseInt(process.env.DB_PORT || '5432', 10);
+  if (isNaN(port)) {
+    throw new Error('Invalid DB_PORT: must be a numeric value');
+  }
+
   // Create test database connection
   const dataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST,
-    port: parseInt(process.env.DB_PORT || '5432'),
+    port,
     username: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,

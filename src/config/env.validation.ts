@@ -17,11 +17,11 @@ export const validationSchema = Joi.object({
     .valid('development', 'production', 'test')
     .default('development'),
 
-  // SMTP (opcional en test)
-  SMTP_HOST: Joi.string().when('NODE_ENV', {
+  // SMTP (optional in test)
+  SMTP_HOST: Joi.when('NODE_ENV', {
     is: Joi.string().valid('production', 'development'),
-    then: Joi.required(),
-    otherwise: Joi.optional(),
+    then: Joi.string().required(),
+    otherwise: Joi.string().optional(),
   }),
   SMTP_PORT: Joi.number().default(587),
   SMTP_USER: Joi.string().optional(),

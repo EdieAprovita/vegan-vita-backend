@@ -46,14 +46,12 @@ export class OrdersService {
         });
 
         if (!product) {
-          throw new BadRequestException(
-            `Producto ${item.productId} no encontrado`,
-          );
+          throw new BadRequestException(`Product ${item.productId} not found`);
         }
 
         if (product.stock < item.qty) {
           throw new BadRequestException(
-            `Stock insuficiente para ${product.name}. Disponible: ${product.stock}, Solicitado: ${item.qty}`,
+            `Insufficient stock for ${product.name}. Available: ${product.stock}, Requested: ${item.qty}`,
           );
         }
 
@@ -151,7 +149,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException('Orden no encontrada');
+      throw new NotFoundException('Order not found');
     }
 
     return order;
@@ -194,7 +192,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException('Orden no encontrada');
+      throw new NotFoundException('Order not found');
     }
 
     const oldStatus = order.status;
@@ -242,7 +240,7 @@ export class OrdersService {
     });
 
     if (!order) {
-      throw new NotFoundException('Orden no encontrada');
+      throw new NotFoundException('Order not found');
     }
 
     order.isDelivered = true;
