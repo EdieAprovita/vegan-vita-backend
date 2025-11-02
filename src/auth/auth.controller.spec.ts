@@ -55,7 +55,7 @@ describe('AuthController', () => {
           email: registerDto.email,
           name: registerDto.name,
         },
-        token: 'jwt-token',
+        access_token: 'jwt-token',
       };
 
       jest
@@ -84,7 +84,7 @@ describe('AuthController', () => {
           email: loginDto.email,
           name: 'Test User',
         },
-        token: 'jwt-token',
+        access_token: 'jwt-token',
       };
 
       jest

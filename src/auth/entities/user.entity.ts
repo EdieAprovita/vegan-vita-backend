@@ -22,6 +22,9 @@ export class User {
   @Column({ type: 'varchar', length: 255, nullable: false })
   name: string;
 
+  @Column({ type: 'boolean', default: false })
+  isAdmin: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
