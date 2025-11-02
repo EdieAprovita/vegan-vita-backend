@@ -19,10 +19,11 @@ export class NotificationsService {
   }
 
   private initializeTransporter() {
+    const smtpPort = this.configService.get<number>('SMTP_PORT');
     this.transporter = nodemailer.createTransport({
       host: this.configService.get<string>('SMTP_HOST'),
-      port: this.configService.get<number>('SMTP_PORT'),
-      secure: false,
+      port: smtpPort,
+      secure: smtpPort === 465, // true for 465 (SSL), false for other ports (587 uses STARTTLS)
       auth: {
         user: this.configService.get<string>('SMTP_USER'),
         pass: this.configService.get<string>('SMTP_PASS'),
@@ -39,10 +40,23 @@ export class NotificationsService {
     ];
 
     templateFiles.forEach((file) => {
-      const filePath = path.join(templatesDir, file);
-      const templateContent = fs.readFileSync(filePath, 'utf8');
-      const templateName = file.replace('.hbs', '');
-      this.templates.set(templateName, handlebars.compile(templateContent));
+      try {
+        const filePath = path.join(templatesDir, file);
+        const templateContent = fs.readFileSync(filePath, 'utf8');
+        const templateName = file.replace('.hbs', '');
+        this.templates.set(templateName, handlebars.compile(templateContent));
+      } catch (error) {
+        const errorMessage =
+          error.code === 'ENOENT'
+            ? `File not found: ${file}`
+            : `Failed to read file: ${error.message}`;
+        this.logger.error(
+          `Failed to load email template: ${file} - ${errorMessage}`,
+        );
+        throw new Error(
+          `Email template initialization failed: ${file} - ${errorMessage}`,
+        );
+      }
     });
 
     this.logger.log(`Loaded ${this.templates.size} email templates`);

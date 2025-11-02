@@ -271,7 +271,7 @@ jobs:
           DB_USER: postgres
           DB_PASSWORD: postgres
           DB_NAME: vegan_vita_test
-          JWT_SECRET: vegan-vita-super-secret-key-for-testing-ci-min-32-characters
+          JWT_SECRET: VeganVita!Test2024SecureKey@Min32
           JWT_EXPIRES_IN: 7d
           NODE_ENV: test
           SMTP_HOST: smtp.test.com

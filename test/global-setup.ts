@@ -32,7 +32,7 @@ export default async function globalSetup() {
   ];
 
   const missingVars = requiredEnvVars.filter(
-    (varName) => !process.env[varName],
+    (varName) => !process.env[varName]?.trim(),
   );
 
   if (missingVars.length > 0) {

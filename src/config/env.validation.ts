@@ -9,7 +9,16 @@ export const validationSchema = Joi.object({
   DB_NAME: Joi.string().required(),
 
   // JWT
-  JWT_SECRET: Joi.string().min(32).required(),
+  JWT_SECRET: Joi.string()
+    .min(32)
+    .pattern(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{32,}$/,
+    )
+    .required()
+    .messages({
+      'string.pattern.base':
+        'JWT_SECRET must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)',
+    }),
   JWT_EXPIRES_IN: Joi.string().default('7d'),
 
   // Node Environment
