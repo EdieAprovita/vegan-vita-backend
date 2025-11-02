@@ -8,6 +8,22 @@ import { Product } from './products/entities/product.entity';
 import { User } from './auth/entities/user.entity';
 
 async function seed() {
+  // Security check: Prevent seed script execution in production
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  if (nodeEnv === 'production') {
+    console.error(
+      '❌ ERROR: Seed script cannot be executed in production environment!',
+    );
+    console.error(
+      '   This script is only intended for development and testing.',
+    );
+    process.exit(1);
+  }
+
+  console.log(
+    `🌱 Running seed script in ${nodeEnv.toUpperCase()} environment...`,
+  );
+
   const app = await NestFactory.createApplicationContext(AppModule);
 
   const dataSource = app.get(DataSource);

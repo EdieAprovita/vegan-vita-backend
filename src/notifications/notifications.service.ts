@@ -12,6 +12,8 @@ export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
   private transporter: nodemailer.Transporter;
   private templates: Map<string, HandlebarsTemplateDelegate> = new Map();
+  private readonly MAX_RETRIES = 3;
+  private readonly RETRY_DELAY_MS = 1000; // Base delay for exponential backoff
 
   constructor(private configService: ConfigService) {
     this.initializeTransporter();
