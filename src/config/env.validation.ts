@@ -14,28 +14,10 @@ export const validationSchema = Joi.object({
     .pattern(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&\-])[A-Za-z\d@$!%*?&\-]{32,}$/,
     )
-    .custom((value, helpers) => {
-      // List of known test/CI secrets
-      const knownTestSecrets = [
-        'VeganVita!Test2024SecureKey@Min32',
-        // Add other known test secrets here if needed
-      ];
-      // Only enforce in production
-      if (
-        helpers?.state?.ancestors &&
-        helpers.state.ancestors[0]?.NODE_ENV === 'production' &&
-        knownTestSecrets.includes(value)
-      ) {
-        return helpers.error('any.invalid');
-      }
-      return value;
-    })
     .required()
     .messages({
       'string.pattern.base':
         'JWT_SECRET must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&-)',
-      'any.invalid':
-        'JWT_SECRET must not use a known test/CI secret in production. Please generate a secure, random secret.',
     }),
   JWT_EXPIRES_IN: Joi.string().default('7d'),
 

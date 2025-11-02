@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { validatePort } from '../src/common/utils/validation.utils';
 
 export default async function globalSetup() {
   console.log('\n🔄 Initializing E2E Test Environment...\n');
@@ -42,11 +43,8 @@ export default async function globalSetup() {
 
   console.log('✅ All required environment variables present');
 
-  // Validate DB_PORT
-  const port = parseInt(process.env.DB_PORT || '5432', 10);
-  if (isNaN(port)) {
-    throw new Error('Invalid DB_PORT: must be a numeric value');
-  }
+  // Validate DB_PORT using shared utility
+  const port = validatePort(process.env.DB_PORT || '5432', 'DB_PORT');
 
   // Create test database connection
   const dataSource = new DataSource({
