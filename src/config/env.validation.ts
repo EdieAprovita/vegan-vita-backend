@@ -11,12 +11,10 @@ export const validationSchema = Joi.object({
   // JWT
   JWT_SECRET: Joi.when('NODE_ENV', {
     is: 'test',
-    then: Joi.string()
-      .min(16)
-      .required()
-      .messages({
-        'string.min': 'JWT_SECRET must be at least 16 characters long in test environment',
-      }),
+    then: Joi.string().min(16).required().messages({
+      'string.min':
+        'JWT_SECRET must be at least 16 characters long in test environment',
+    }),
     otherwise: Joi.string()
       .min(32)
       .pattern(

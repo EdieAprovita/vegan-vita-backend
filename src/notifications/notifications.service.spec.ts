@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 import * as fs from 'fs';
 import { Order } from '../orders/entities/order.entity';
+import { OrderItem } from '../orders/entities/order-item.entity';
 import { OrderStatus } from '../orders/entities/order-status.enum';
 
 jest.mock('nodemailer');
@@ -97,8 +98,8 @@ describe('NotificationsService', () => {
             image: '/images/product1.jpg',
             productId: 'prod-1',
             orderId: '123',
-          } as any,
-        ],
+          } as Partial<OrderItem>,
+        ] as OrderItem[],
         shippingAddress: {
           fullName: 'John Doe',
           address: '123 Main St',
@@ -155,8 +156,8 @@ describe('NotificationsService', () => {
             image: '/images/product1.jpg',
             productId: 'prod-1',
             orderId: '123',
-          } as any,
-        ],
+          } as Partial<OrderItem>,
+        ] as OrderItem[],
         shippingAddress: {
           fullName: 'John Doe',
           address: '123 Main St',

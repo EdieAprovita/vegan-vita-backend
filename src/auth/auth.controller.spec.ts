@@ -4,6 +4,7 @@ import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 describe('AuthController', () => {
   let controller: AuthController;
@@ -100,15 +101,15 @@ describe('AuthController', () => {
 
   describe('getMe', () => {
     it('should return current user information', async () => {
-      const user = {
+      const user: Partial<User> = {
         id: '1',
         email: 'test@example.com',
         name: 'Test User',
       };
 
-      const req = { user };
+      const req: Partial<RequestWithUser> = { user: user as User };
 
-      const result = await controller.getMe(req);
+      const result = await controller.getMe(req as RequestWithUser);
 
       expect(result).toEqual({
         id: user.id,
