@@ -1,21 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let mockUserRepository: any;
+  let mockUsersService: any;
   let mockJwtService: any;
 
   beforeEach(async () => {
-    mockUserRepository = {
-      findOne: jest.fn(),
+    mockUsersService = {
+      findByEmail: jest.fn(),
       create: jest.fn(),
-      save: jest.fn(),
+      findOne: jest.fn(),
     };
 
     mockJwtService = {
@@ -26,8 +25,8 @@ describe('AuthService', () => {
       providers: [
         AuthService,
         {
-          provide: getRepositoryToken(User),
-          useValue: mockUserRepository,
+          provide: UsersService,
+          useValue: mockUsersService,
         },
         {
           provide: JwtService,
@@ -55,32 +54,21 @@ describe('AuthService', () => {
         name: 'Test User',
       };
 
-      const hashedPassword = 'hashedPassword123';
       const savedUser = {
         id: '1',
         email: registerDto.email,
         name: registerDto.name,
-        password: hashedPassword,
+        password: 'hashedPassword123',
       };
 
-      mockUserRepository.findOne.mockResolvedValue(null);
-      jest.spyOn(bcrypt, 'hash').mockResolvedValue(hashedPassword as never);
-      mockUserRepository.create.mockReturnValue(savedUser);
-      mockUserRepository.save.mockResolvedValue(savedUser);
+      mockUsersService.findByEmail.mockResolvedValue(null);
+      mockUsersService.create.mockResolvedValue(savedUser);
       mockJwtService.sign.mockReturnValue('jwt-token');
 
       const result = await service.register(registerDto);
 
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
-        where: { email: registerDto.email },
-      });
-      expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 10);
-      expect(mockUserRepository.create).toHaveBeenCalledWith({
-        email: registerDto.email,
-        password: hashedPassword,
-        name: registerDto.name,
-      });
-      expect(mockUserRepository.save).toHaveBeenCalledWith(savedUser);
+      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(registerDto.email);
+      expect(mockUsersService.create).toHaveBeenCalledWith(registerDto);
       expect(mockJwtService.sign).toHaveBeenCalledWith(
         { id: savedUser.id, email: savedUser.email },
         {
@@ -112,7 +100,7 @@ describe('AuthService', () => {
         password: 'hashedPassword',
       };
 
-      mockUserRepository.findOne.mockResolvedValue(existingUser);
+      mockUsersService.findByEmail.mockResolvedValue(existingUser);
 
       await expect(service.register(registerDto)).rejects.toThrow(
         ConflictException,
@@ -120,11 +108,8 @@ describe('AuthService', () => {
       await expect(service.register(registerDto)).rejects.toThrow(
         'El email ya está registrado',
       );
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
-        where: { email: registerDto.email },
-      });
-      expect(mockUserRepository.create).not.toHaveBeenCalled();
-      expect(mockUserRepository.save).not.toHaveBeenCalled();
+      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(registerDto.email);
+      expect(mockUsersService.create).not.toHaveBeenCalled();
     });
   });
 
@@ -142,15 +127,13 @@ describe('AuthService', () => {
         password: 'hashedPassword123',
       };
 
-      mockUserRepository.findOne.mockResolvedValue(user);
+      mockUsersService.findByEmail.mockResolvedValue(user);
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(true as never);
       mockJwtService.sign.mockReturnValue('jwt-token');
 
       const result = await service.login(loginDto);
 
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
-        where: { email: loginDto.email },
-      });
+      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
       expect(bcrypt.compare).toHaveBeenCalledWith(
         loginDto.password,
         user.password,
@@ -178,7 +161,7 @@ describe('AuthService', () => {
         password: 'password123',
       };
 
-      mockUserRepository.findOne.mockResolvedValue(null);
+      mockUsersService.findByEmail.mockResolvedValue(null);
 
       await expect(service.login(loginDto)).rejects.toThrow(
         UnauthorizedException,
@@ -186,9 +169,7 @@ describe('AuthService', () => {
       await expect(service.login(loginDto)).rejects.toThrow(
         'Credenciales inválidas',
       );
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
-        where: { email: loginDto.email },
-      });
+      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
     });
 
     it('should throw UnauthorizedException if password is invalid', async () => {
@@ -204,7 +185,7 @@ describe('AuthService', () => {
         password: 'hashedPassword123',
       };
 
-      mockUserRepository.findOne.mockResolvedValue(user);
+      mockUsersService.findByEmail.mockResolvedValue(user);
       jest.spyOn(bcrypt, 'compare').mockResolvedValue(false as never);
 
       await expect(service.login(loginDto)).rejects.toThrow(
@@ -213,9 +194,7 @@ describe('AuthService', () => {
       await expect(service.login(loginDto)).rejects.toThrow(
         'Credenciales inválidas',
       );
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
-        where: { email: loginDto.email },
-      });
+      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
       expect(bcrypt.compare).toHaveBeenCalledWith(
         loginDto.password,
         user.password,
@@ -233,26 +212,22 @@ describe('AuthService', () => {
         password: 'hashedPassword',
       };
 
-      mockUserRepository.findOne.mockResolvedValue(user);
+      mockUsersService.findOne.mockResolvedValue(user);
 
       const result = await service.validateUser(userId);
 
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
-        where: { id: userId },
-      });
+      expect(mockUsersService.findOne).toHaveBeenCalledWith(userId);
       expect(result).toEqual(user);
     });
 
     it('should return null if user not found', async () => {
       const userId = 'nonexistent';
 
-      mockUserRepository.findOne.mockResolvedValue(null);
+      mockUsersService.findOne.mockResolvedValue(null);
 
       const result = await service.validateUser(userId);
 
-      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
-        where: { id: userId },
-      });
+      expect(mockUsersService.findOne).toHaveBeenCalledWith(userId);
       expect(result).toBeNull();
     });
   });

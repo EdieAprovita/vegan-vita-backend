@@ -6,7 +6,7 @@ import { Order, OrderStatus } from './entities';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 describe('OrdersController', () => {

@@ -10,7 +10,7 @@ import {
   Index,
   BaseEntity,
 } from 'typeorm';
-import { User } from '../../auth/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { OrderStatus } from './order-status.enum';
 

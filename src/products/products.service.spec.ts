@@ -5,7 +5,7 @@ import { Product } from './entities/product.entity';
 import { Category } from './entities/category.entity';
 import { Review } from './entities/review.entity';
 import { NotFoundException, ConflictException } from '@nestjs/common';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 
 describe('ProductsService', () => {
   let service: ProductsService;

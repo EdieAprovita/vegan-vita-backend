@@ -1,18 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 describe('AuthController', () => {
   let controller: AuthController;
 
-  const mockUserRepository = {
-    findOne: jest.fn(),
+  const mockUsersService = {
+    findByEmail: jest.fn(),
     create: jest.fn(),
-    save: jest.fn(),
+    findOne: jest.fn(),
   };
 
   const mockJwtService = {
@@ -25,8 +25,8 @@ describe('AuthController', () => {
       providers: [
         AuthService,
         {
-          provide: getRepositoryToken(User),
-          useValue: mockUserRepository,
+          provide: UsersService,
+          useValue: mockUsersService,
         },
         {
           provide: JwtService,

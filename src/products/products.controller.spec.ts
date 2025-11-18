@@ -3,7 +3,7 @@ import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Product, Category, Review } from './entities';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 describe('ProductsController', () => {

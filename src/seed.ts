@@ -5,7 +5,7 @@ import * as bcrypt from 'bcrypt';
 import { AppModule } from './app.module';
 import { Category } from './products/entities/category.entity';
 import { Product } from './products/entities/product.entity';
-import { User } from './auth/entities/user.entity';
+import { User } from './users/entities/user.entity';
 
 async function seed() {
   // Security check: Prevent seed script execution in production
