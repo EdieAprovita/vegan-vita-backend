@@ -39,7 +39,8 @@ export default async function globalSetup() {
   }
   if (!process.env.STRIPE_WEBHOOK_SECRET) {
     console.log('ℹ️ Injecting dummy STRIPE_WEBHOOK_SECRET for tests');
-    process.env.STRIPE_WEBHOOK_SECRET = 'whsec_12345678901234567890123456789012'; // Must be > 32 chars
+    process.env.STRIPE_WEBHOOK_SECRET =
+      'whsec_12345678901234567890123456789012'; // Must be > 32 chars
   }
 
   const missingVars = requiredEnvVars.filter(
