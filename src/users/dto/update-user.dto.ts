@@ -1,5 +1,5 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsBoolean, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsBoolean, IsOptional } from 'class-validator';
 import { RegisterDto } from '../../auth/dto/register.dto';
 
 export class UpdateUserDto extends PartialType(RegisterDto) {
