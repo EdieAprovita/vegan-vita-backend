@@ -17,9 +17,9 @@
   <img src="https://img.shields.io/badge/Status-MVP%20Ready-success?style=flat-square" alt="Status" />
 </p>
 
-## 🚀 Estado del Proyecto: 70% Completado (MVP Ready)
+## 🚀 Estado del Proyecto: 85% Completado (MVP Ready)
 
-**Sistema de Órdenes Completo ✅ | Sistema de Pagos Pendiente ⏸️**
+**Sistema de Órdenes Completo ✅ | Sistema de Pagos con Stripe ✅**
 
 > 📄 **[Ver Análisis Completo del Estado Actual](ESTADO_ACTUAL_PROYECTO.md)** - Documento detallado con progreso, métricas y próximos pasos
 
@@ -33,7 +33,8 @@
 - ✅ **Roles de Usuario** - Admin y usuario regular con guards
 - ✅ **104 Tests Unitarios** - Cobertura completa de lógica de negocio
 - ✅ **Seed Data** - Datos de prueba incluidos
-- 🆕 **Sistema de Notificaciones** - Emails con plantillas Handlebars + webhooks
+- ✅ **Sistema de Notificaciones** - Emails con plantillas Handlebars + webhooks
+- 🆕 **Integración Stripe** - Sistema de pagos completo con Payment Intents y Webhooks
 
 **Documentación Relevante:**
 - 📊 [**ESTADO_ACTUAL_PROYECTO.md**](ESTADO_ACTUAL_PROYECTO.md) - Análisis detallado del progreso (70% completado)
@@ -131,6 +132,11 @@ FRONTEND_URL=http://localhost:3001
 
 # Webhook URL (opcional)
 WEBHOOK_URL=https://your-webhook-endpoint.com/notifications
+
+# Stripe Configuration (requerido para pagos)
+STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxx
+STRIPE_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxx  # Opcional, para documentación
 ```
 
 ### 4️⃣ Iniciar Base de Datos con Docker
@@ -236,6 +242,35 @@ Authorization: Bearer <token>
   "rating": 5,
   "comment": "Excelente producto!"
 }
+```
+
+### 💳 Pagos (`/api/payments`)
+
+```bash
+# Crear Payment Intent para una orden
+POST /api/payments/create-intent
+Authorization: Bearer <token>
+{
+  "orderId": "<order_id>"
+}
+
+# Respuesta:
+{
+  "clientSecret": "pi_xxx_secret_xxx",
+  "paymentIntentId": "pi_xxx",
+  "amount": 10000,
+  "currency": "usd",
+  "status": "requires_payment_method"
+}
+
+# Consultar estado de Payment Intent
+GET /api/payments/:paymentIntentId
+Authorization: Bearer <token>
+
+# Webhook de Stripe (configurar en Stripe Dashboard)
+POST /api/payments/webhook
+stripe-signature: <signature>
+# Body: Raw JSON from Stripe
 ```
 
 ### 🛒 Órdenes (`/api/orders`)
@@ -349,13 +384,18 @@ vegan-vita-backend/
 │   │   ├── products.module.ts
 │   │   ├── dto/                         # DTOs de productos
 │   │   └── entities/                    # Product, Category, Review
-│   ├── orders/                          # 🆕 Módulo de órdenes
+│   ├── orders/                          # Módulo de órdenes
 │   │   ├── orders.controller.ts
 │   │   ├── orders.service.ts
 │   │   ├── orders.module.ts
 │   │   ├── dto/                         # CreateOrder, UpdateStatus
 │   │   └── entities/                    # Order, OrderItem, OrderStatus
-│   └── notifications/                   # 🆕 Módulo de notificaciones
+│   ├── payments/                        # 🆕 Módulo de pagos Stripe
+│   │   ├── payments.controller.ts
+│   │   ├── payments.service.ts
+│   │   ├── payments.module.ts
+│   │   └── dto/                         # CreatePaymentIntent, PaymentIntentResponse
+│   └── notifications/                   # Módulo de notificaciones
 │       ├── notifications.service.ts
 │       ├── notifications.module.ts
 │       └── templates/                   # Email templates (.hbs)
@@ -411,6 +451,72 @@ graph LR
 ✅ **Validación de Stock**: Previene overselling  
 ✅ **Control de Acceso**: Solo owner o admin pueden ver/modificar órdenes  
 ✅ **Cálculo Automático**: itemsPrice, shippingPrice, taxPrice, totalPrice  
+
+## 💳 Configuración de Stripe
+
+### 1. Crear Cuenta de Stripe
+
+1. **Registro Inicial**
+   - Visitar https://dashboard.stripe.com/register
+   - Proporcionar correo electrónico y crear contraseña
+   - Confirmar correo electrónico
+
+2. **Información de la Empresa**
+   - Nombre legal del negocio
+   - Tipo de negocio: E-commerce / Retail
+   - País de operación: México/USA
+
+3. **Verificación de Identidad (KYC)**
+   - Proporcionar documentos de identificación oficial
+   - Número de identificación fiscal (RFC/EIN)
+
+4. **Configurar Cuenta Bancaria**
+   - Agregar cuenta bancaria para recibir transferencias
+   - Stripe soporta transferencias en MXN y USD
+
+### 2. Obtener API Keys
+
+1. Acceder al Dashboard: https://dashboard.stripe.com
+2. Ir a "Developers" > "API keys"
+3. Copiar las siguientes keys:
+   - **Publishable key**: Empieza con `pk_test_` (modo test) o `pk_live_` (producción)
+   - **Secret key**: Empieza con `sk_test_` (modo test) o `sk_live_` (producción)
+
+**IMPORTANTE**: Nunca compartir ni commitear las Secret Keys. Usar siempre variables de entorno.
+
+### 3. Configurar Webhooks
+
+1. En el Dashboard, ir a "Developers" > "Webhooks"
+2. Click en "Add endpoint"
+3. Configurar endpoint URL:
+   - **Producción**: `https://tu-dominio.com/api/payments/webhook`
+   - **Desarrollo local**: Usar ngrok o similar: `https://xxxx.ngrok.io/api/payments/webhook`
+4. Seleccionar eventos a escuchar:
+   - `payment_intent.succeeded`
+   - `payment_intent.payment_failed`
+   - `payment_intent.canceled`
+   - `charge.refunded`
+5. Copiar el **Webhook signing secret** (empieza con `whsec_`)
+
+### 4. Configurar Modo Test
+
+Durante el desarrollo, usar siempre el modo test:
+- Usar keys que empiezan con `pk_test_` y `sk_test_`
+- Tarjetas de prueba disponibles en: https://stripe.com/docs/testing
+  - Tarjeta exitosa: `4242 4242 4242 4242`
+  - Tarjeta rechazada: `4000 0000 0000 0002`
+  - Requiere autenticación 3D: `4000 0027 6000 3184`
+
+### 5. Flujo de Pago Completo
+
+1. **Cliente crea orden**: `POST /api/orders` → recibe `orderId`
+2. **Cliente solicita payment intent**: `POST /api/payments/create-intent { orderId }` → recibe `clientSecret`
+3. **Frontend usa `clientSecret`** con Stripe.js para mostrar formulario de pago
+4. **Usuario completa pago** en frontend
+5. **Stripe envía webhook** → Backend actualiza orden a PAID automáticamente
+6. **Cliente consulta orden actualizada**: `GET /api/orders/:id`
+
+**Referencia oficial**: https://docs.stripe.com/development/quickstart
 
 ## 📧 Configuración de Email
 
@@ -525,10 +631,9 @@ Después de ejecutar `pnpm run seed`:
 - **[Guía de Desarrollo E-commerce](docs/GUIA_DESARROLLO_ECOMMERCE.md)** - Guía de desarrollo completa
 - **[CI/CD Summary](docs/CI-CD_SUMMARY.md)** - Configuración de CI/CD
 
-## 🚧 Próximas Funcionalidades (30% restante)
+## 🚧 Próximas Funcionalidades (15% restante)
 
 ### 🔴 Alta Prioridad
-- [ ] **Integración con PayPal** (3-4 días) - Sistema de pagos completo
 - [ ] **Gestión de Usuarios (Admin)** (1.5 días) - CRUD de usuarios por admin
 - [ ] **Documentación Swagger/OpenAPI** (1 día) - API docs interactiva
 

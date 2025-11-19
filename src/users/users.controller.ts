@@ -39,7 +39,7 @@ export class UsersController {
     if (updateUserDto.isAdmin !== undefined) {
       delete updateUserDto.isAdmin;
     }
-    
+
     const user = await this.usersService.update(req.user.id, updateUserDto);
     return new UserResponseDto(user);
   }

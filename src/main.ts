@@ -3,7 +3,9 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true, // Enable raw body for Stripe webhooks
+  });
   app.setGlobalPrefix('api'); // Prefijo para todos los endpoints
   app.useGlobalPipes(
     new ValidationPipe({

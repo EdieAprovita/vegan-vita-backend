@@ -67,7 +67,9 @@ describe('AuthService', () => {
 
       const result = await service.register(registerDto);
 
-      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(registerDto.email);
+      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(
+        registerDto.email,
+      );
       expect(mockUsersService.create).toHaveBeenCalledWith(registerDto);
       expect(mockJwtService.sign).toHaveBeenCalledWith(
         { id: savedUser.id, email: savedUser.email },
@@ -108,7 +110,9 @@ describe('AuthService', () => {
       await expect(service.register(registerDto)).rejects.toThrow(
         'El email ya está registrado',
       );
-      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(registerDto.email);
+      expect(mockUsersService.findByEmail).toHaveBeenCalledWith(
+        registerDto.email,
+      );
       expect(mockUsersService.create).not.toHaveBeenCalled();
     });
   });

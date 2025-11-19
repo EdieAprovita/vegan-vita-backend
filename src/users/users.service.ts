@@ -34,12 +34,12 @@ export class UsersService {
   async create(registerDto: RegisterDto): Promise<User> {
     const { password } = registerDto;
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     const user = this.userRepository.create({
       ...registerDto,
       password: hashedPassword,
     });
-    
+
     return this.userRepository.save(user);
   }
 

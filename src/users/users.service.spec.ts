@@ -125,7 +125,10 @@ describe('UsersService', () => {
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
         where: { id: '1' },
       });
-      expect(mockUserRepository.merge).toHaveBeenCalledWith(user, updateUserDto);
+      expect(mockUserRepository.merge).toHaveBeenCalledWith(
+        user,
+        updateUserDto,
+      );
       expect(mockUserRepository.save).toHaveBeenCalledWith(updatedUser);
       expect(result).toEqual(updatedUser);
     });

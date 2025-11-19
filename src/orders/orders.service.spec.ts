@@ -398,6 +398,74 @@ describe('OrdersService', () => {
     });
   });
 
+  describe('updatePaymentStatus', () => {
+    let mockOrder;
+
+    beforeEach(() => {
+      mockOrder = {
+        id: 'order-1',
+        status: OrderStatus.PENDING,
+        isPaid: false,
+        paidAt: null,
+        stripePaymentIntentId: null,
+        stripePaymentStatus: null,
+        save: jest.fn(),
+      };
+    });
+
+    it('should update payment status and send notifications when paid', async () => {
+      mockOrderRepository.findOne.mockResolvedValue(
+        mockOrder as unknown as Order,
+      );
+      mockOrder.save.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.PAID,
+        isPaid: true,
+        stripePaymentIntentId: 'pi_123',
+        stripePaymentStatus: 'succeeded',
+      });
+
+      await service.updatePaymentStatus('order-1', {
+        stripePaymentIntentId: 'pi_123',
+        stripePaymentStatus: 'succeeded',
+        isPaid: true,
+      });
+
+      expect(mockOrder.status).toBe(OrderStatus.PAID);
+      expect(mockOrder.isPaid).toBe(true);
+      expect(mockNotificationsService.sendStatusUpdate).toHaveBeenCalledWith(
+        expect.any(Object),
+        OrderStatus.PENDING,
+        OrderStatus.PAID,
+      );
+      expect(
+        mockNotificationsService.sendWebhookNotification,
+      ).toHaveBeenCalledWith('order.paid', expect.any(Object));
+    });
+
+    it('should not send notifications if payment failed (not paid)', async () => {
+      mockOrderRepository.findOne.mockResolvedValue(
+        mockOrder as unknown as Order,
+      );
+      mockOrder.save.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.PENDING,
+        isPaid: false,
+        stripePaymentIntentId: 'pi_123',
+        stripePaymentStatus: 'requires_payment_method',
+      });
+
+      await service.updatePaymentStatus('order-1', {
+        stripePaymentIntentId: 'pi_123',
+        stripePaymentStatus: 'requires_payment_method',
+        isPaid: false,
+      });
+
+      expect(mockOrder.status).toBe(OrderStatus.PENDING);
+      expect(mockNotificationsService.sendStatusUpdate).not.toHaveBeenCalled();
+    });
+  });
+
   describe('findAll (Admin)', () => {
     it('should return paginated orders with metadata', async () => {
       const mockOrders = [

@@ -56,6 +56,16 @@ export class Order extends BaseEntity {
     email_address?: string;
   } | null;
 
+  @Column({ type: 'varchar', nullable: true, unique: true })
+  @Index()
+  stripePaymentIntentId: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  stripePaymentStatus: string | null;
+
+  @Column({ type: 'boolean', default: false })
+  isRefunded: boolean;
+
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   itemsPrice: number;
 
