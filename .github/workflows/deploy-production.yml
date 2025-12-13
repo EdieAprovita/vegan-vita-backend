@@ -133,7 +133,6 @@ jobs:
     environment:
       name: production
     env:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       PRODUCTION_SERVER_HOST: ${{ secrets.PRODUCTION_SERVER_HOST }}
       PRODUCTION_SERVER_USER: ${{ secrets.PRODUCTION_SERVER_USER }}
       PRODUCTION_SSH_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
@@ -146,16 +145,20 @@ jobs:
 
       - name: Configure SSH
         if: ${{ env.PRODUCTION_SERVER_HOST != '' && env.PRODUCTION_SERVER_USER != '' && env.PRODUCTION_SSH_KEY != '' }}
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
+
+      - name: Add SSH known hosts
+        if: ${{ env.PRODUCTION_SERVER_HOST != '' }}
         run: |
           mkdir -p ~/.ssh
-          echo "${{ env.PRODUCTION_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ env.PRODUCTION_SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy application
         if: ${{ env.PRODUCTION_SERVER_HOST != '' && env.PRODUCTION_SERVER_USER != '' && env.PRODUCTION_SSH_KEY != '' && env.PRODUCTION_APP_PATH != '' }}
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ env.PRODUCTION_SERVER_USER }}@${{ env.PRODUCTION_SERVER_HOST }} << "EOF"
+          ssh ${{ env.PRODUCTION_SERVER_USER }}@${{ env.PRODUCTION_SERVER_HOST }} << "EOF"
           set -e
 
           echo "🚀 Starting VeganVita Backend deployment..."
@@ -201,105 +204,7 @@ jobs:
           echo "❌ Health check failed"
           exit 1
 
-      - name: Slack notification - Success
-        if: ${{ success() && env.SLACK_WEBHOOK_URL != '' }}
-        uses: slackapi/slack-github-action@v2.1.1
-        with:
-          payload: |
-            {
-              "text": "✅ Production deployment successful",
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "✅ Production Deployment Successful"
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\n✅ Success"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Environment:*\nProduction"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch:*\nmain"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Commit:*\n${{ github.sha }}"
-                    }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*URL:* ${{ env.PRODUCTION_APP_URL }}\n*Logs:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
-      - name: Slack notification - Failure
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL != '' }}
-        uses: slackapi/slack-github-action@v2.1.1
-        with:
-          payload: |
-            {
-              "text": "❌ Production deployment failed",
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "❌ Production Deployment Failed"
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\n❌ Failed"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Environment:*\nProduction"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch:*\nmain"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Commit:*\n${{ github.sha }}"
-                    }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Logs:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
-      - name: Create deployment record
+      - name: Deployment summary
         if: always()
         run: |
           echo "Deployment completed at $(date)" >> $GITHUB_STEP_SUMMARY
