@@ -10,7 +10,7 @@ import {
   Index,
   BaseEntity,
 } from 'typeorm';
-import { User } from '../../auth/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 import { OrderItem } from './order-item.entity';
 import { OrderStatus } from './order-status.enum';
 
@@ -55,6 +55,16 @@ export class Order extends BaseEntity {
     update_time?: string;
     email_address?: string;
   } | null;
+
+  @Column({ type: 'varchar', nullable: true, unique: true })
+  @Index()
+  stripePaymentIntentId: string | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  stripePaymentStatus: string | null;
+
+  @Column({ type: 'boolean', default: false })
+  isRefunded: boolean;
 
   @Column({ type: 'decimal', precision: 10, scale: 2 })
   itemsPrice: number;

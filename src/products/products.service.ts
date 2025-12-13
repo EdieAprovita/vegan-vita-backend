@@ -12,7 +12,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { User } from '../auth/entities/user.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class ProductsService {

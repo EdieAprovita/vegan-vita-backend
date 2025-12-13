@@ -4,11 +4,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
 import { OrdersModule } from './orders/orders.module';
-import { User } from './auth/entities/user.entity';
+import { PaymentsModule } from './payments/payments.module';
+import { User } from './users/entities/user.entity';
 import { Product, Category, Review } from './products/entities';
 import { Order, OrderItem } from './orders/entities';
 import { HealthController } from './health.controller';
 import { validationSchema } from './config/env.validation';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -39,8 +41,10 @@ import { validationSchema } from './config/env.validation';
       }),
     }),
     AuthModule,
+    UsersModule,
     ProductsModule,
     OrdersModule,
+    PaymentsModule,
   ],
   controllers: [HealthController],
   providers: [],

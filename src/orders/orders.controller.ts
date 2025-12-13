@@ -22,6 +22,7 @@ import {
 import { Order } from './entities';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -29,19 +30,22 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  async create(@Body() createOrderDto: CreateOrderDto, @Request() req) {
+  async create(
+    @Body() createOrderDto: CreateOrderDto,
+    @Request() req: RequestWithUser,
+  ) {
     return this.ordersService.create(createOrderDto, req.user.id);
   }
 
   @Get('myorders')
-  async getMyOrders(@Request() req) {
+  async getMyOrders(@Request() req: RequestWithUser) {
     return this.ordersService.findMyOrders(req.user.id);
   }
 
   @Get(':id')
   async getOrderById(
     @Param('id', new ParseUUIDPipe()) id: string,
-    @Request() req,
+    @Request() req: RequestWithUser,
   ) {
     const order = await this.ordersService.findOne(id);
 
@@ -59,7 +63,7 @@ export class OrdersController {
   async updateOrderStatus(
     @Param('id', new ParseUUIDPipe()) id: string,
     @Body() updateOrderStatusDto: UpdateOrderStatusDto,
-    @Request() req,
+    @Request() req: RequestWithUser,
   ) {
     const order = await this.ordersService.findOne(id);
 

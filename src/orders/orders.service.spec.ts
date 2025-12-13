@@ -23,24 +23,24 @@ describe('OrdersService', () => {
       findOne: jest.fn(),
       find: jest.fn(),
       count: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<Repository<Order>>;
 
     mockOrderItemRepository = {
       create: jest.fn(),
       save: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<Repository<OrderItem>>;
 
     mockProductRepository = {
       findOne: jest.fn(),
       save: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<Repository<Product>>;
 
     mockNotificationsService = {
       sendOrderConfirmation: jest.fn(),
       sendStatusUpdate: jest.fn(),
       sendDeliveryConfirmation: jest.fn(),
       sendWebhookNotification: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<NotificationsService>;
 
     mockQueryRunner = {
       connect: jest.fn(),
@@ -52,12 +52,12 @@ describe('OrdersService', () => {
         findOne: jest.fn(),
         save: jest.fn(),
         create: jest.fn(),
-      } as any,
-    } as any;
+      } as Partial<jest.Mocked<QueryRunner['manager']>>,
+    } as unknown as jest.Mocked<QueryRunner>;
 
     mockDataSource = {
       createQueryRunner: jest.fn().mockReturnValue(mockQueryRunner),
-    } as any;
+    } as unknown as jest.Mocked<DataSource>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -160,7 +160,7 @@ describe('OrdersService', () => {
 
       (mockQueryRunner.manager.create as jest.Mock).mockReturnValue(savedOrder);
       (mockQueryRunner.manager.save as jest.Mock).mockResolvedValue(savedOrder);
-      mockOrderRepository.findOne.mockResolvedValue(savedOrder as any);
+      mockOrderRepository.findOne.mockResolvedValue(savedOrder as Order);
 
       const result = await service.create(createOrderDto, mockUser.id);
 
@@ -235,7 +235,7 @@ describe('OrdersService', () => {
 
       (mockQueryRunner.manager.create as jest.Mock).mockReturnValue(savedOrder);
       (mockQueryRunner.manager.save as jest.Mock).mockResolvedValue(savedOrder);
-      mockOrderRepository.findOne.mockResolvedValue(savedOrder as any);
+      mockOrderRepository.findOne.mockResolvedValue(savedOrder as Order);
 
       const result = await service.create(createOrderDto, mockUser.id);
 
@@ -252,7 +252,7 @@ describe('OrdersService', () => {
         { id: 'order-2', userId, status: OrderStatus.DELIVERED },
       ];
 
-      mockOrderRepository.find.mockResolvedValue(mockOrders as any);
+      mockOrderRepository.find.mockResolvedValue(mockOrders as Order[]);
 
       const result = await service.findMyOrders(userId);
 
@@ -281,7 +281,7 @@ describe('OrdersService', () => {
         status: OrderStatus.PENDING,
       };
 
-      mockOrderRepository.findOne.mockResolvedValue(mockOrder as any);
+      mockOrderRepository.findOne.mockResolvedValue(mockOrder as Order);
 
       const result = await service.findOne('order-1');
 
@@ -316,7 +316,9 @@ describe('OrdersService', () => {
     };
 
     it('should update order status and send notifications', async () => {
-      mockOrderRepository.findOne.mockResolvedValue(mockOrder as any);
+      mockOrderRepository.findOne.mockResolvedValue(
+        mockOrder as unknown as Order,
+      );
       mockOrder.save.mockResolvedValue({
         ...mockOrder,
         status: OrderStatus.PAID,
@@ -338,7 +340,9 @@ describe('OrdersService', () => {
     });
 
     it('should mark order as paid when status is PAID', async () => {
-      mockOrderRepository.findOne.mockResolvedValue(mockOrder as any);
+      mockOrderRepository.findOne.mockResolvedValue(
+        mockOrder as unknown as Order,
+      );
       mockOrder.save.mockResolvedValue({
         ...mockOrder,
         status: OrderStatus.PAID,
@@ -371,7 +375,9 @@ describe('OrdersService', () => {
         save: jest.fn(),
       };
 
-      mockOrderRepository.findOne.mockResolvedValue(mockOrder as any);
+      mockOrderRepository.findOne.mockResolvedValue(
+        mockOrder as unknown as Order,
+      );
       mockOrder.save.mockResolvedValue({
         ...mockOrder,
         isDelivered: true,
@@ -392,6 +398,74 @@ describe('OrdersService', () => {
     });
   });
 
+  describe('updatePaymentStatus', () => {
+    let mockOrder;
+
+    beforeEach(() => {
+      mockOrder = {
+        id: 'order-1',
+        status: OrderStatus.PENDING,
+        isPaid: false,
+        paidAt: null,
+        stripePaymentIntentId: null,
+        stripePaymentStatus: null,
+        save: jest.fn(),
+      };
+    });
+
+    it('should update payment status and send notifications when paid', async () => {
+      mockOrderRepository.findOne.mockResolvedValue(
+        mockOrder as unknown as Order,
+      );
+      mockOrder.save.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.PAID,
+        isPaid: true,
+        stripePaymentIntentId: 'pi_123',
+        stripePaymentStatus: 'succeeded',
+      });
+
+      await service.updatePaymentStatus('order-1', {
+        stripePaymentIntentId: 'pi_123',
+        stripePaymentStatus: 'succeeded',
+        isPaid: true,
+      });
+
+      expect(mockOrder.status).toBe(OrderStatus.PAID);
+      expect(mockOrder.isPaid).toBe(true);
+      expect(mockNotificationsService.sendStatusUpdate).toHaveBeenCalledWith(
+        expect.any(Object),
+        OrderStatus.PENDING,
+        OrderStatus.PAID,
+      );
+      expect(
+        mockNotificationsService.sendWebhookNotification,
+      ).toHaveBeenCalledWith('order.paid', expect.any(Object));
+    });
+
+    it('should not send notifications if payment failed (not paid)', async () => {
+      mockOrderRepository.findOne.mockResolvedValue(
+        mockOrder as unknown as Order,
+      );
+      mockOrder.save.mockResolvedValue({
+        ...mockOrder,
+        status: OrderStatus.PENDING,
+        isPaid: false,
+        stripePaymentIntentId: 'pi_123',
+        stripePaymentStatus: 'requires_payment_method',
+      });
+
+      await service.updatePaymentStatus('order-1', {
+        stripePaymentIntentId: 'pi_123',
+        stripePaymentStatus: 'requires_payment_method',
+        isPaid: false,
+      });
+
+      expect(mockOrder.status).toBe(OrderStatus.PENDING);
+      expect(mockNotificationsService.sendStatusUpdate).not.toHaveBeenCalled();
+    });
+  });
+
   describe('findAll (Admin)', () => {
     it('should return paginated orders with metadata', async () => {
       const mockOrders = [
@@ -399,7 +473,7 @@ describe('OrdersService', () => {
         { id: 'order-2', status: OrderStatus.DELIVERED },
       ];
 
-      mockOrderRepository.find.mockResolvedValue(mockOrders as any);
+      mockOrderRepository.find.mockResolvedValue(mockOrders as Order[]);
       mockOrderRepository.count.mockResolvedValue(10);
 
       const result = await service.findAll(1, 2);
@@ -436,7 +510,7 @@ describe('OrdersService', () => {
     it('should allow owner to access their order', async () => {
       const mockOrder = { id: 'order-1', userId: 'user-1' };
 
-      mockOrderRepository.findOne.mockResolvedValue(mockOrder as any);
+      mockOrderRepository.findOne.mockResolvedValue(mockOrder as Order);
 
       const result = await service.findOne('order-1');
 
@@ -446,7 +520,7 @@ describe('OrdersService', () => {
     it('should allow admin to access any order', async () => {
       const mockOrder = { id: 'order-1', userId: 'user-1' };
 
-      mockOrderRepository.findOne.mockResolvedValue(mockOrder as any);
+      mockOrderRepository.findOne.mockResolvedValue(mockOrder as Order);
 
       const result = await service.findOne('order-1');
 

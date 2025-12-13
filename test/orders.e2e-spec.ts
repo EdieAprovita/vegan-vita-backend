@@ -4,7 +4,7 @@ import * as request from 'supertest';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { AppModule } from '../src/app.module';
-import { User } from '../src/auth/entities/user.entity';
+import { User } from '../src/users/entities/user.entity';
 import { Product } from '../src/products/entities/product.entity';
 import { Category } from '../src/products/entities/category.entity';
 import { OrderStatus } from '../src/orders/entities/order-status.enum';

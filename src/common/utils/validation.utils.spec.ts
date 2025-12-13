@@ -25,8 +25,12 @@ describe('Validation Utils', () => {
     });
 
     it('should throw error for non-numeric string', () => {
-      expect(() => validatePort('abc')).toThrow('Invalid PORT: must be a numeric value');
-      expect(() => validatePort('')).toThrow('Invalid PORT: must be a numeric value');
+      expect(() => validatePort('abc')).toThrow(
+        'Invalid PORT: must be a numeric value',
+      );
+      expect(() => validatePort('')).toThrow(
+        'Invalid PORT: must be a numeric value',
+      );
     });
 
     it('should accept decimal strings and truncate to integer', () => {
@@ -36,15 +40,27 @@ describe('Validation Utils', () => {
     });
 
     it('should throw error for port below minimum (0)', () => {
-      expect(() => validatePort('0')).toThrow('Invalid PORT: must be between 1 and 65535');
-      expect(() => validatePort(0)).toThrow('Invalid PORT: must be between 1 and 65535');
-      expect(() => validatePort('-1')).toThrow('Invalid PORT: must be between 1 and 65535');
+      expect(() => validatePort('0')).toThrow(
+        'Invalid PORT: must be between 1 and 65535',
+      );
+      expect(() => validatePort(0)).toThrow(
+        'Invalid PORT: must be between 1 and 65535',
+      );
+      expect(() => validatePort('-1')).toThrow(
+        'Invalid PORT: must be between 1 and 65535',
+      );
     });
 
     it('should throw error for port above maximum (65536)', () => {
-      expect(() => validatePort('65536')).toThrow('Invalid PORT: must be between 1 and 65535');
-      expect(() => validatePort(65536)).toThrow('Invalid PORT: must be between 1 and 65535');
-      expect(() => validatePort('100000')).toThrow('Invalid PORT: must be between 1 and 65535');
+      expect(() => validatePort('65536')).toThrow(
+        'Invalid PORT: must be between 1 and 65535',
+      );
+      expect(() => validatePort(65536)).toThrow(
+        'Invalid PORT: must be between 1 and 65535',
+      );
+      expect(() => validatePort('100000')).toThrow(
+        'Invalid PORT: must be between 1 and 65535',
+      );
     });
 
     it('should use custom field name in error messages', () => {
@@ -57,7 +73,9 @@ describe('Validation Utils', () => {
     });
 
     it('should handle NaN values', () => {
-      expect(() => validatePort(NaN)).toThrow('Invalid PORT: must be a numeric value');
+      expect(() => validatePort(NaN)).toThrow(
+        'Invalid PORT: must be a numeric value',
+      );
     });
   });
 });

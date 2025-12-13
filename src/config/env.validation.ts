@@ -11,12 +11,10 @@ export const validationSchema = Joi.object({
   // JWT
   JWT_SECRET: Joi.when('NODE_ENV', {
     is: 'test',
-    then: Joi.string()
-      .min(16)
-      .required()
-      .messages({
-        'string.min': 'JWT_SECRET must be at least 16 characters long in test environment',
-      }),
+    then: Joi.string().min(16).required().messages({
+      'string.min':
+        'JWT_SECRET must be at least 16 characters long in test environment',
+    }),
     otherwise: Joi.string()
       .min(32)
       .pattern(
@@ -48,4 +46,35 @@ export const validationSchema = Joi.object({
 
   // Frontend
   FRONTEND_URL: Joi.string().uri().optional(),
+
+  // Stripe
+  STRIPE_SECRET_KEY: Joi.when('NODE_ENV', {
+    is: 'test',
+    then: Joi.string().optional(),
+    otherwise: Joi.string()
+      .pattern(/^sk_(test|live)_[a-zA-Z0-9]{24,}$/)
+      .required()
+      .messages({
+        'string.pattern.base':
+          'STRIPE_SECRET_KEY must start with sk_test_ or sk_live_ followed by at least 24 characters',
+      }),
+  }),
+  STRIPE_WEBHOOK_SECRET: Joi.when('NODE_ENV', {
+    is: 'test',
+    then: Joi.string().optional(),
+    otherwise: Joi.string()
+      .pattern(/^whsec_[a-zA-Z0-9]{32,}$/)
+      .required()
+      .messages({
+        'string.pattern.base':
+          'STRIPE_WEBHOOK_SECRET must start with whsec_ followed by at least 32 characters',
+      }),
+  }),
+  STRIPE_PUBLISHABLE_KEY: Joi.string()
+    .pattern(/^pk_(test|live)_[a-zA-Z0-9]{24,}$/)
+    .optional()
+    .messages({
+      'string.pattern.base':
+        'STRIPE_PUBLISHABLE_KEY must start with pk_test_ or pk_live_ followed by at least 24 characters',
+    }),
 });

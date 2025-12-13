@@ -3,6 +3,8 @@ import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Product, Category, Review } from './entities';
+import { User } from '../users/entities/user.entity';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -71,14 +73,17 @@ describe('ProductsController', () => {
             reviews: [],
             createdAt: new Date(),
             updatedAt: new Date(),
-          } as any,
+          } as Partial<Product>,
         ],
         meta: { total: 1, page: 1, limit: 10, pages: 1 },
       };
 
-      jest
-        .spyOn(controller['productsService'], 'findAll')
-        .mockResolvedValue(expectedResult);
+      jest.spyOn(controller['productsService'], 'findAll').mockResolvedValue(
+        expectedResult as unknown as {
+          data: Product[];
+          meta: { total: number; page: number; limit: number; pages: number };
+        },
+      );
 
       const result = await controller.findAll(filterDto);
 
@@ -100,7 +105,7 @@ describe('ProductsController', () => {
           products: [],
           createdAt: new Date(),
           updatedAt: new Date(),
-        } as any,
+        } as Partial<Category>,
         {
           id: '2',
           name: 'Category 2',
@@ -109,12 +114,12 @@ describe('ProductsController', () => {
           products: [],
           createdAt: new Date(),
           updatedAt: new Date(),
-        } as any,
+        } as Partial<Category>,
       ];
 
       jest
         .spyOn(controller['productsService'], 'findAllCategories')
-        .mockResolvedValue(expectedResult);
+        .mockResolvedValue(expectedResult as unknown as Category[]);
 
       const result = await controller.findAllCategories();
 
@@ -140,11 +145,11 @@ describe('ProductsController', () => {
         reviews: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-      } as any;
+      } as Partial<Product>;
 
       jest
         .spyOn(controller['productsService'], 'findBySlug')
-        .mockResolvedValue(expectedResult);
+        .mockResolvedValue(expectedResult as unknown as Product);
 
       const result = await controller.findBySlug(slug);
 
@@ -167,12 +172,12 @@ describe('ProductsController', () => {
           author: null,
           createdAt: new Date(),
           updatedAt: new Date(),
-        } as any,
+        } as Partial<Review>,
       ];
 
       jest
         .spyOn(controller['productsService'], 'findReviews')
-        .mockResolvedValue(expectedResult);
+        .mockResolvedValue(expectedResult as unknown as Review[]);
 
       const result = await controller.findReviews(productId);
 
@@ -187,26 +192,29 @@ describe('ProductsController', () => {
     it('should create a review for a product', async () => {
       const productId = '1';
       const createReviewDto = { rating: 5, comment: 'Excellent!' };
-      const user = { id: '1', email: 'user@example.com', name: 'User' };
-      const req = { user };
+      const user: Partial<User> = {
+        id: '1',
+        email: 'user@example.com',
+        name: 'User',
+      };
+      const req: Partial<RequestWithUser> = { user: user as User };
 
-      const expectedResult = {
+      const expectedResult: Partial<Review> = {
         id: '1',
         ...createReviewDto,
         product: null,
-        author: user as any,
+        author: user as User,
         createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any;
+      };
 
       jest
         .spyOn(controller['productsService'], 'createReview')
-        .mockResolvedValue(expectedResult);
+        .mockResolvedValue(expectedResult as Review);
 
       const result = await controller.createReview(
         productId,
         createReviewDto,
-        req,
+        req as RequestWithUser,
       );
 
       expect(result).toEqual(expectedResult);
@@ -237,11 +245,11 @@ describe('ProductsController', () => {
         reviews: [],
         createdAt: new Date(),
         updatedAt: new Date(),
-      } as any;
+      } as Partial<Product>;
 
       jest
         .spyOn(controller['productsService'], 'create')
-        .mockResolvedValue(expectedResult);
+        .mockResolvedValue(expectedResult as unknown as Product);
 
       const result = await controller.create(createProductDto);
 
@@ -268,11 +276,11 @@ describe('ProductsController', () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         ...updateProductDto,
-      } as any;
+      } as Partial<Product>;
 
       jest
         .spyOn(controller['productsService'], 'update')
-        .mockResolvedValue(expectedResult);
+        .mockResolvedValue(expectedResult as unknown as Product);
 
       const result = await controller.update(productId, updateProductDto);
 

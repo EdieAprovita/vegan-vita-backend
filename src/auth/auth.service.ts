@@ -3,45 +3,32 @@ import {
   ConflictException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
-import { User } from './entities/user.entity';
+import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const { email, password, name } = registerDto;
+    const { email } = registerDto;
 
     // Verificar si el usuario ya existe
-    const existingUser = await this.userRepository.findOne({
-      where: { email },
-    });
+    const existingUser = await this.usersService.findByEmail(email);
 
     if (existingUser) {
       throw new ConflictException('El email ya está registrado');
     }
 
-    // Hashear la contraseña
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Crear el nuevo usuario
-    const user = this.userRepository.create({
-      email,
-      password: hashedPassword,
-      name,
-    });
-
-    await this.userRepository.save(user);
+    // Crear el nuevo usuario (UsersService se encarga del hashing)
+    const user = await this.usersService.create(registerDto);
 
     // Generar JWT
     const token = this.jwtService.sign(
@@ -67,7 +54,7 @@ export class AuthService {
     const { email, password } = loginDto;
 
     // Buscar al usuario por email
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.usersService.findByEmail(email);
 
     if (!user) {
       throw new UnauthorizedException('Credenciales inválidas');
@@ -101,6 +88,6 @@ export class AuthService {
   }
 
   async validateUser(id: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { id } });
+    return this.usersService.findOne(id);
   }
 }

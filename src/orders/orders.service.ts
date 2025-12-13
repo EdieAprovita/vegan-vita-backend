@@ -265,4 +265,67 @@ export class OrdersService {
     this.logger.log(`Order ${id} marked as delivered`);
     return deliveredOrder;
   }
+
+  async updatePaymentStatus(
+    id: string,
+    paymentData: {
+      stripePaymentIntentId: string;
+      stripePaymentStatus: string;
+      isPaid?: boolean;
+      paidAt?: Date;
+      isRefunded?: boolean;
+    },
+  ): Promise<Order> {
+    const order = await this.orderRepository.findOne({
+      where: { id },
+      relations: ['user', 'orderItems', 'orderItems.product'],
+    });
+
+    if (!order) {
+      throw new NotFoundException('Order not found');
+    }
+
+    order.stripePaymentIntentId = paymentData.stripePaymentIntentId;
+    order.stripePaymentStatus = paymentData.stripePaymentStatus;
+
+    if (paymentData.isPaid !== undefined) {
+      order.isPaid = paymentData.isPaid;
+      if (paymentData.isPaid && !order.paidAt) {
+        order.paidAt = paymentData.paidAt || new Date();
+        const oldStatus = order.status;
+        order.status = OrderStatus.PAID;
+
+        // Send notifications only if status changed to PAID
+        if (oldStatus !== OrderStatus.PAID) {
+          try {
+            await this.notificationsService.sendStatusUpdate(
+              order,
+              oldStatus,
+              OrderStatus.PAID,
+            );
+            await this.notificationsService.sendWebhookNotification(
+              'order.paid', // Specific event for payment
+              order,
+            );
+          } catch (error) {
+            this.logger.error(
+              `Failed to send payment notifications: ${error.message}`,
+            );
+          }
+        }
+      }
+    }
+
+    if (paymentData.isRefunded !== undefined) {
+      order.isRefunded = paymentData.isRefunded;
+    }
+
+    const updatedOrder = await order.save();
+
+    this.logger.log(
+      `Order ${id} payment status updated: ${paymentData.stripePaymentStatus}`,
+    );
+
+    return updatedOrder;
+  }
 }

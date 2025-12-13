@@ -1,0 +1,43 @@
+name: 'Setup Node.js and PNPM'
+description: 'Composite action to setup Node.js, PNPM and configure dependency caching'
+author: 'VeganVita Team'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '20'
+  pnpm-version:
+    description: 'PNPM version to use'
+    required: false
+    default: '10'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    - name: Setup PNPM
+      uses: pnpm/action-setup@v4
+      with:
+        version: ${{ inputs.pnpm-version }}
+
+    - name: Get PNPM Store Directory
+      shell: bash
+      id: pnpm-cache
+      run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+    - name: Setup PNPM Cache
+      uses: actions/cache@v3
+      with:
+        path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+        key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-
+
+    - name: Install Dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile

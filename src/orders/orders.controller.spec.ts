@@ -6,24 +6,32 @@ import { Order, OrderStatus } from './entities';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
+import { User } from '../users/entities/user.entity';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 describe('OrdersController', () => {
   let controller: OrdersController;
   let mockOrdersService: jest.Mocked<OrdersService>;
 
-  const mockUser = {
+  const mockUser: Partial<User> = {
     id: 'user-1',
     email: 'user@example.com',
     name: 'Test User',
     isAdmin: false,
   };
 
-  const mockAdmin = {
+  const mockAdmin: Partial<User> = {
     id: 'admin-1',
     email: 'admin@example.com',
     name: 'Admin User',
     isAdmin: true,
   };
+
+  // Helper function to create mock request with user
+  const createMockRequest = (user: Partial<User>): RequestWithUser =>
+    ({
+      user: user as User,
+    }) as RequestWithUser;
 
   const mockOrder: Partial<Order> = {
     id: 'order-1',
@@ -47,7 +55,7 @@ describe('OrdersController', () => {
       findAll: jest.fn(),
       updateStatus: jest.fn(),
       markAsDelivered: jest.fn(),
-    } as any;
+    } as unknown as jest.Mocked<OrdersService>;
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [OrdersController],
@@ -94,9 +102,10 @@ describe('OrdersController', () => {
     it('should create a new order', async () => {
       mockOrdersService.create.mockResolvedValue(mockOrder as Order);
 
-      const result = await controller.create(createOrderDto, {
-        user: mockUser,
-      });
+      const result = await controller.create(
+        createOrderDto,
+        createMockRequest(mockUser),
+      );
 
       expect(mockOrdersService.create).toHaveBeenCalledWith(
         createOrderDto,
@@ -111,7 +120,7 @@ describe('OrdersController', () => {
       );
 
       await expect(
-        controller.create(createOrderDto, { user: mockUser }),
+        controller.create(createOrderDto, createMockRequest(mockUser)),
       ).rejects.toThrow('Stock insuficiente');
     });
   });
@@ -121,7 +130,7 @@ describe('OrdersController', () => {
       const mockOrders = [mockOrder, { ...mockOrder, id: 'order-2' }];
       mockOrdersService.findMyOrders.mockResolvedValue(mockOrders as Order[]);
 
-      const result = await controller.getMyOrders({ user: mockUser });
+      const result = await controller.getMyOrders(createMockRequest(mockUser));
 
       expect(mockOrdersService.findMyOrders).toHaveBeenCalledWith(mockUser.id);
       expect(result).toEqual(mockOrders);
@@ -130,7 +139,7 @@ describe('OrdersController', () => {
     it('should return empty array when user has no orders', async () => {
       mockOrdersService.findMyOrders.mockResolvedValue([]);
 
-      const result = await controller.getMyOrders({ user: mockUser });
+      const result = await controller.getMyOrders(createMockRequest(mockUser));
 
       expect(result).toEqual([]);
     });
@@ -140,9 +149,10 @@ describe('OrdersController', () => {
     it('should return order by id for owner', async () => {
       mockOrdersService.findOne.mockResolvedValue(mockOrder as Order);
 
-      const result = await controller.getOrderById('order-1', {
-        user: mockUser,
-      });
+      const result = await controller.getOrderById(
+        'order-1',
+        createMockRequest(mockUser),
+      );
 
       expect(mockOrdersService.findOne).toHaveBeenCalledWith('order-1');
       expect(result).toEqual(mockOrder);
@@ -152,9 +162,10 @@ describe('OrdersController', () => {
       const otherUserOrder = { ...mockOrder, userId: 'other-user' };
       mockOrdersService.findOne.mockResolvedValue(otherUserOrder as Order);
 
-      const result = await controller.getOrderById('order-1', {
-        user: mockAdmin,
-      });
+      const result = await controller.getOrderById(
+        'order-1',
+        createMockRequest(mockAdmin),
+      );
 
       expect(result).toEqual(otherUserOrder);
     });
@@ -164,10 +175,10 @@ describe('OrdersController', () => {
       mockOrdersService.findOne.mockResolvedValue(otherUserOrder as Order);
 
       await expect(
-        controller.getOrderById('order-1', { user: mockUser }),
+        controller.getOrderById('order-1', createMockRequest(mockUser)),
       ).rejects.toThrow(ForbiddenException);
       await expect(
-        controller.getOrderById('order-1', { user: mockUser }),
+        controller.getOrderById('order-1', createMockRequest(mockUser)),
       ).rejects.toThrow('No tienes permiso para acceder a esta orden');
     });
 
@@ -177,7 +188,7 @@ describe('OrdersController', () => {
       );
 
       await expect(
-        controller.getOrderById('nonexistent', { user: mockUser }),
+        controller.getOrderById('nonexistent', createMockRequest(mockUser)),
       ).rejects.toThrow(NotFoundException);
     });
   });
@@ -195,7 +206,7 @@ describe('OrdersController', () => {
       const result = await controller.updateOrderStatus(
         'order-1',
         updateStatusDto,
-        { user: mockUser },
+        createMockRequest(mockUser),
       );
 
       expect(mockOrdersService.updateStatus).toHaveBeenCalledWith(
@@ -217,7 +228,7 @@ describe('OrdersController', () => {
       const result = await controller.updateOrderStatus(
         'order-1',
         updateStatusDto,
-        { user: mockUser },
+        createMockRequest(mockUser),
       );
 
       expect(result.isPaid).toBe(true);
@@ -228,9 +239,11 @@ describe('OrdersController', () => {
       mockOrdersService.findOne.mockResolvedValue(otherUserOrder as Order);
 
       await expect(
-        controller.updateOrderStatus('order-1', updateStatusDto, {
-          user: mockUser,
-        }),
+        controller.updateOrderStatus(
+          'order-1',
+          updateStatusDto,
+          createMockRequest(mockUser),
+        ),
       ).rejects.toThrow(ForbiddenException);
     });
   });
@@ -257,7 +270,7 @@ describe('OrdersController', () => {
   describe('getAllOrders', () => {
     it('should return paginated orders for admin', async () => {
       const paginatedResult = {
-        data: [mockOrder, { ...mockOrder, id: 'order-2' }],
+        data: [mockOrder, { ...mockOrder, id: 'order-2' }] as Order[],
         metadata: {
           total: 2,
           page: 1,
@@ -265,7 +278,7 @@ describe('OrdersController', () => {
           totalPages: 1,
         },
       };
-      mockOrdersService.findAll.mockResolvedValue(paginatedResult as any);
+      mockOrdersService.findAll.mockResolvedValue(paginatedResult);
 
       const result = await controller.getAllOrders(1, 10);
 
@@ -276,7 +289,7 @@ describe('OrdersController', () => {
 
     it('should handle pagination correctly', async () => {
       const paginatedResult = {
-        data: [mockOrder],
+        data: [mockOrder] as Order[],
         metadata: {
           total: 25,
           page: 2,
@@ -284,7 +297,7 @@ describe('OrdersController', () => {
           totalPages: 3,
         },
       };
-      mockOrdersService.findAll.mockResolvedValue(paginatedResult as any);
+      mockOrdersService.findAll.mockResolvedValue(paginatedResult);
 
       const result = await controller.getAllOrders(2, 10);
 
@@ -295,10 +308,10 @@ describe('OrdersController', () => {
 
     it('should use default pagination values', async () => {
       const paginatedResult = {
-        data: [],
+        data: [] as Order[],
         metadata: { total: 0, page: 1, limit: 10, totalPages: 0 },
       };
-      mockOrdersService.findAll.mockResolvedValue(paginatedResult as any);
+      mockOrdersService.findAll.mockResolvedValue(paginatedResult);
 
       await controller.getAllOrders();
 

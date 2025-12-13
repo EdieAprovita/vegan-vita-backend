@@ -32,6 +32,17 @@ export default async function globalSetup() {
     'JWT_SECRET',
   ];
 
+  // Inject dummy Stripe keys for testing if not present
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.log('ℹ️ Injecting dummy STRIPE_SECRET_KEY for tests');
+    process.env.STRIPE_SECRET_KEY = 'sk_test_123456789012345678901234'; // Must be > 24 chars
+  }
+  if (!process.env.STRIPE_WEBHOOK_SECRET) {
+    console.log('ℹ️ Injecting dummy STRIPE_WEBHOOK_SECRET for tests');
+    process.env.STRIPE_WEBHOOK_SECRET =
+      'whsec_12345678901234567890123456789012'; // Must be > 32 chars
+  }
+
   const missingVars = requiredEnvVars.filter(
     (varName) => !process.env[varName]?.trim(),
   );
