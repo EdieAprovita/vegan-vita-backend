@@ -28,19 +28,16 @@ jobs:
         run: pnpm run build
 
       - name: Configure SSH
-        if: ${{ secrets.STAGING_SSH_KEY != '' }}
         uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
 
       - name: Add SSH known hosts
-        if: ${{ secrets.STAGING_SSH_KEY != '' && secrets.STAGING_SERVER_HOST != '' }}
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.STAGING_SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to staging server
-        if: ${{ secrets.STAGING_SSH_KEY != '' && secrets.STAGING_SERVER_HOST != '' && secrets.STAGING_SERVER_USER != '' }}
         run: |
           ssh ${{ secrets.STAGING_SERVER_USER }}@${{ secrets.STAGING_SERVER_HOST }} << 'EOF'
           cd ${{ secrets.STAGING_APP_PATH }}
@@ -51,7 +48,6 @@ jobs:
           EOF
 
       - name: Health check
-        if: ${{ secrets.STAGING_SSH_KEY != '' && secrets.STAGING_APP_URL != '' }}
         run: |
           sleep 5
           curl -f ${{ secrets.STAGING_APP_URL }}/api/health || exit 1
