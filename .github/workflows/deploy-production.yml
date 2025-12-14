@@ -37,8 +37,15 @@ jobs:
       DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: vegan_vita_test
-      JWT_SECRET: test-secret-key
+      JWT_SECRET: VeganVita!Test2024SecureKey@Min32
+      JWT_EXPIRES_IN: 7d
       NODE_ENV: test
+      SMTP_HOST: smtp.test.com
+      SMTP_PORT: 587
+      SMTP_USER: test@test.com
+      SMTP_PASS: test-password
+      SMTP_FROM: 'VeganVita Test <noreply@test.com>'
+      FRONTEND_URL: http://localhost:3001
     outputs:
       should_deploy: ${{ steps.check.outputs.should_deploy }}
 
