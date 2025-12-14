@@ -133,7 +133,7 @@ jobs:
         run: pnpm run build
 
       - name: Upload Build Artifacts
-        if: ${{ success() }}
+        if: success()
         uses: actions/upload-artifact@v5
         with:
           name: dist-${{ github.run_id }}
@@ -296,7 +296,7 @@ jobs:
           SMTP_PORT: 587
           SMTP_USER: test@test.com
           SMTP_PASS: test-password
-          SMTP_FROM: "VeganVita Test <noreply@test.com>"
+          SMTP_FROM: 'VeganVita Test <noreply@test.com>'
           FRONTEND_URL: http://localhost:3001
 
   # ============================================
