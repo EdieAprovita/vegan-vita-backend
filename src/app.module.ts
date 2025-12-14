@@ -19,7 +19,7 @@ import { UsersModule } from './users/users.module';
       validationSchema: validationSchema,
       validationOptions: {
         allowUnknown: true,
-        abortEarly: false, // Mostrar todos los errores, no solo el primero
+        abortEarly: false, // Show all errors, not just the first one
       },
     }),
     TypeOrmModule.forRootAsync({

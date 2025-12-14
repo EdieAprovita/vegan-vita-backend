@@ -127,7 +127,7 @@ describe('NotificationsService', () => {
         expect.objectContaining({
           from: 'noreply@veganvita.com',
           to: 'john@example.com',
-          subject: expect.stringContaining('Confirmación de Pedido'),
+          subject: expect.stringContaining('Order Confirmation'),
         }),
       );
     });
@@ -207,7 +207,7 @@ describe('NotificationsService', () => {
         expect.objectContaining({
           from: 'noreply@veganvita.com',
           to: 'john@example.com',
-          subject: expect.stringContaining('Actualización de Pedido'),
+          subject: expect.stringContaining('Order Update'),
         }),
       );
     });
@@ -243,7 +243,7 @@ describe('NotificationsService', () => {
         expect.objectContaining({
           from: 'noreply@veganvita.com',
           to: 'john@example.com',
-          subject: expect.stringContaining('Entregado'),
+          subject: expect.stringContaining('Delivered'),
         }),
       );
     });
@@ -252,20 +252,20 @@ describe('NotificationsService', () => {
   describe('getStatusMessage', () => {
     it('should return appropriate messages for each status', () => {
       expect(service['getStatusMessage'](OrderStatus.PENDING)).toContain(
-        'Pendiente',
+        'Pending',
       );
       expect(service['getStatusMessage'](OrderStatus.PROCESSING)).toContain(
-        'Procesando',
+        'Processing',
       );
-      expect(service['getStatusMessage'](OrderStatus.PAID)).toContain('Pagado');
+      expect(service['getStatusMessage'](OrderStatus.PAID)).toContain('Paid');
       expect(service['getStatusMessage'](OrderStatus.SHIPPED)).toContain(
-        'Enviado',
+        'Shipped',
       );
       expect(service['getStatusMessage'](OrderStatus.DELIVERED)).toContain(
-        'Entregado',
+        'Delivered',
       );
       expect(service['getStatusMessage'](OrderStatus.CANCELLED)).toContain(
-        'Cancelado',
+        'Cancelled',
       );
     });
   });

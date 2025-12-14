@@ -1,4 +1,5 @@
 # ANÁLISIS COMPLETO DEL PROYECTO VEGAN VITA BACKEND
+
 ## Comparación con ProShop MERN - Plan de Implementación Detallado
 
 **Fecha de análisis:** 01 de noviembre de 2025 (Actualizado: 08 nov 2025)
@@ -49,7 +50,7 @@
 
 1. ✅ **Sistema de Órdenes/Pedidos** - ~~PRIORIDAD ALTA~~ **COMPLETADO** 🎉
 2. ✅ **Sistema de Roles y Permisos** - ~~PRIORIDAD MEDIA~~ **COMPLETADO** 🎉
-3. ❌ **Sistema de Pagos (PayPal/Stripe)** - PRIORIDAD ALTA (diferido)
+3. 🟡 **Sistema de Pagos (DUMMY)** - PRIORIDAD ALTA (modo mock/no producción)
 4. ❌ **Panel de Administración** - PRIORIDAD ALTA (parcial: órdenes ✅, usuarios ❌)
 5. ❌ **Gestión de Usuarios (Admin)** - PRIORIDAD MEDIA
 6. ❌ **Upload de Imágenes** - PRIORIDAD MEDIA
@@ -58,16 +59,16 @@
 
 ### 1.3 Tiempo Estimado Total
 
-| Fase | Duración | Estado | Dedicación |
-|------|----------|--------|------------|
-| **Fase 1: Preparación** | ~~2-3 días~~ | ✅ **COMPLETADA** | Full-time |
-| **Fase 2: Sistema de Órdenes** | ~~4-5 días~~ | ✅ **COMPLETADA** | Full-time |
-| **Fase 3: Sistema de Pagos** | 3-4 días | ⏸️ **PENDIENTE** | Full-time |
-| **Fase 4: Panel Admin** | 3-4 días | 🟡 **PARCIAL (50%)** | Full-time |
-| **Fase 5: Features Adicionales** | 4-5 días | 🟡 **PARCIAL (20%)** | Full-time |
-| **Fase 6: Testing y Documentación** | 2-3 días | 🟡 **PARCIAL (60%)** | Full-time |
-| **TOTAL ORIGINAL** | ~~18-24 días~~ | **70% COMPLETO** | **Full-time (8h/día)** |
-| **RESTANTE ESTIMADO** | **6-8 días** | **Para 95%** | **Full-time (8h/día)** |
+| Fase                                | Duración       | Estado                  | Dedicación             |
+| ----------------------------------- | -------------- | ----------------------- | ---------------------- |
+| **Fase 1: Preparación**             | ~~2-3 días~~   | ✅ **COMPLETADA**       | Full-time              |
+| **Fase 2: Sistema de Órdenes**      | ~~4-5 días~~   | ✅ **COMPLETADA**       | Full-time              |
+| **Fase 3: Sistema de Pagos DUMMY**  | 1 día          | 🟡 **EN PLANIFICACIÓN** | Full-time              |
+| **Fase 4: Panel Admin**             | 3-4 días       | 🟡 **PARCIAL (50%)**    | Full-time              |
+| **Fase 5: Features Adicionales**    | 4-5 días       | 🟡 **PARCIAL (20%)**    | Full-time              |
+| **Fase 6: Testing y Documentación** | 2-3 días       | 🟡 **PARCIAL (60%)**    | Full-time              |
+| **TOTAL ORIGINAL**                  | ~~18-24 días~~ | **70% COMPLETO**        | **Full-time (8h/día)** |
+| **RESTANTE ESTIMADO**               | **6-8 días**   | **Para 95%**            | **Full-time (8h/día)** |
 
 ---
 
@@ -76,18 +77,20 @@
 ### 2.1 Lo que YA TIENES Implementado ✅
 
 #### A. AUTENTICACIÓN COMPLETA (100%)
+
 **Ubicación:** `/src/auth/`
 
-| Feature | Estado | Detalles |
-|---------|--------|----------|
+| Feature              | Estado      | Detalles                             |
+| -------------------- | ----------- | ------------------------------------ |
 | Registro de usuarios | ✅ Completo | Email, password, name con validación |
-| Login con JWT | ✅ Completo | Tokens de 7 días |
-| Validación de tokens | ✅ Completo | JwtAuthGuard + JwtStrategy |
-| Hash de passwords | ✅ Completo | bcrypt con salt 10 |
-| Obtener perfil | ✅ Completo | GET /api/auth/me |
-| Tests completos | ✅ Completo | 259 líneas auth.service.spec.ts |
+| Login con JWT        | ✅ Completo | Tokens de 7 días                     |
+| Validación de tokens | ✅ Completo | JwtAuthGuard + JwtStrategy           |
+| Hash de passwords    | ✅ Completo | bcrypt con salt 10                   |
+| Obtener perfil       | ✅ Completo | GET /api/auth/me                     |
+| Tests completos      | ✅ Completo | 259 líneas auth.service.spec.ts      |
 
 **Archivos clave:**
+
 - [auth.service.ts](src/auth/auth.service.ts) - Lógica de autenticación
 - [auth.controller.ts](src/auth/auth.controller.ts) - Endpoints
 - [jwt.strategy.ts](src/auth/strategies/jwt.strategy.ts) - Estrategia JWT
@@ -95,6 +98,7 @@
 - [user.entity.ts](src/auth/entities/user.entity.ts) - Modelo de usuario
 
 **Endpoints disponibles:**
+
 ```
 POST /api/auth/register  - Registro de nuevo usuario
 POST /api/auth/login     - Login y obtención de token
@@ -102,20 +106,22 @@ GET  /api/auth/me        - Obtener perfil actual (protegido)
 ```
 
 #### B. SISTEMA DE PRODUCTOS (85%)
+
 **Ubicación:** `/src/products/`
 
-| Feature | Estado | Detalles |
-|---------|--------|----------|
-| CRUD de productos | ✅ Completo | Create, Read, Update, Delete |
-| Búsqueda y filtros | ✅ Completo | Por nombre, categoría, precio |
-| Paginación | ✅ Completo | page, limit, metadata |
-| Categorías | ✅ Completo | Modelo separado con relaciones |
-| Reseñas | ✅ Completo | Rating 1-5 + comentario |
-| Slug único | ✅ Completo | Generado automáticamente |
-| Validaciones | ✅ Completo | DTOs con class-validator |
-| Tests completos | ✅ Completo | 868 líneas de tests |
+| Feature            | Estado      | Detalles                       |
+| ------------------ | ----------- | ------------------------------ |
+| CRUD de productos  | ✅ Completo | Create, Read, Update, Delete   |
+| Búsqueda y filtros | ✅ Completo | Por nombre, categoría, precio  |
+| Paginación         | ✅ Completo | page, limit, metadata          |
+| Categorías         | ✅ Completo | Modelo separado con relaciones |
+| Reseñas            | ✅ Completo | Rating 1-5 + comentario        |
+| Slug único         | ✅ Completo | Generado automáticamente       |
+| Validaciones       | ✅ Completo | DTOs con class-validator       |
+| Tests completos    | ✅ Completo | 868 líneas de tests            |
 
 **Archivos clave:**
+
 - [products.service.ts](src/products/products.service.ts) - Lógica de negocio
 - [products.controller.ts](src/products/products.controller.ts) - Endpoints
 - [product.entity.ts](src/products/entities/product.entity.ts) - Modelo producto
@@ -123,6 +129,7 @@ GET  /api/auth/me        - Obtener perfil actual (protegido)
 - [review.entity.ts](src/products/entities/review.entity.ts) - Modelo reseña
 
 **Endpoints disponibles:**
+
 ```
 GET    /api/products              - Listar con filtros (público)
 GET    /api/products/categories   - Listar categorías (público)
@@ -136,17 +143,18 @@ DELETE /api/products/:id          - Eliminar producto (protegido)
 
 #### C. INFRAESTRUCTURA Y CONFIGURACIÓN (100%)
 
-| Componente | Estado | Detalles |
-|------------|--------|----------|
-| TypeORM + PostgreSQL | ✅ Completo | Configuración async con retry |
-| Docker Compose | ✅ Completo | PostgreSQL 16-alpine |
-| Dockerfile multi-stage | ✅ Completo | Optimizado para producción |
-| Variables de entorno | ✅ Completo | ConfigModule global |
-| ESLint + Prettier | ✅ Completo | Configuración estándar |
-| GitHub Actions | ✅ Completo | 8 workflows CI/CD |
-| Health Check | ✅ Completo | GET /api/health |
+| Componente             | Estado      | Detalles                      |
+| ---------------------- | ----------- | ----------------------------- |
+| TypeORM + PostgreSQL   | ✅ Completo | Configuración async con retry |
+| Docker Compose         | ✅ Completo | PostgreSQL 16-alpine          |
+| Dockerfile multi-stage | ✅ Completo | Optimizado para producción    |
+| Variables de entorno   | ✅ Completo | ConfigModule global           |
+| ESLint + Prettier      | ✅ Completo | Configuración estándar        |
+| GitHub Actions         | ✅ Completo | 8 workflows CI/CD             |
+| Health Check           | ✅ Completo | GET /api/health               |
 
 **Archivos clave:**
+
 - [app.module.ts](src/app.module.ts) - Módulo raíz
 - [main.ts](src/main.ts) - Entry point
 - [docker-compose.yml](docker-compose.yml) - Servicios Docker
@@ -155,47 +163,47 @@ DELETE /api/products/:id          - Eliminar producto (protegido)
 
 #### D. TESTING (90%)
 
-| Tipo | Cobertura | Archivos |
-|------|-----------|----------|
-| Tests unitarios Auth | ✅ Completo | 379 líneas |
-| Tests unitarios Products | ✅ Completo | 868 líneas |
-| Tests E2E | ✅ Parcial | 32 líneas |
-| **Total** | **1,307 líneas** | **7 archivos** |
+| Tipo                     | Cobertura        | Archivos       |
+| ------------------------ | ---------------- | -------------- |
+| Tests unitarios Auth     | ✅ Completo      | 379 líneas     |
+| Tests unitarios Products | ✅ Completo      | 868 líneas     |
+| Tests E2E                | ✅ Parcial       | 32 líneas      |
+| **Total**                | **1,307 líneas** | **7 archivos** |
 
 ### 2.2 Comparación con ProShop MERN
 
 #### Tabla Comparativa General
 
-| Módulo/Feature | ProShop MERN | Vegan Vita Backend | Estado |
-|----------------|--------------|-------------------|--------|
-| **Autenticación** | ✅ | ✅ | **COMPLETO** |
-| Registro de usuarios | ✅ | ✅ | ✅ |
-| Login con JWT | ✅ | ✅ | ✅ |
-| Perfil de usuario | ✅ | ✅ | ✅ |
-| Actualizar perfil | ✅ | ❌ | **FALTA** |
-| **Productos** | ✅ | ✅ | **PARCIAL** |
-| CRUD productos | ✅ | ✅ | ✅ |
-| Búsqueda/filtros | ✅ | ✅ | ✅ |
-| Reseñas | ✅ | ✅ | ✅ |
-| Top productos | ✅ | ❌ | **FALTA** |
-| Rating promedio | ✅ | ❌ | **FALTA** |
-| Upload de imágenes | ✅ | ❌ | **FALTA** |
-| **Órdenes/Pedidos** | ✅ | ❌ | **FALTA** |
-| Crear orden | ✅ | ❌ | **FALTA** |
-| Ver mis órdenes | ✅ | ❌ | **FALTA** |
-| Ver orden por ID | ✅ | ❌ | **FALTA** |
-| Marcar como pagado | ✅ | ❌ | **FALTA** |
-| Marcar como entregado | ✅ | ❌ | **FALTA** |
-| **Panel Admin** | ✅ | ❌ | **FALTA** |
-| Listar usuarios | ✅ | ❌ | **FALTA** |
-| Eliminar usuario | ✅ | ❌ | **FALTA** |
-| Actualizar usuario | ✅ | ❌ | **FALTA** |
-| Listar órdenes | ✅ | ❌ | **FALTA** |
-| **Sistema de Pagos** | ✅ | ❌ | **FALTA** |
-| PayPal integration | ✅ | ❌ | **FALTA** |
-| **Sistema de Roles** | ✅ | ❌ | **FALTA** |
-| isAdmin flag | ✅ | ❌ | **FALTA** |
-| Admin middleware | ✅ | ❌ | **FALTA** |
+| Módulo/Feature        | ProShop MERN | Vegan Vita Backend | Estado       |
+| --------------------- | ------------ | ------------------ | ------------ |
+| **Autenticación**     | ✅           | ✅                 | **COMPLETO** |
+| Registro de usuarios  | ✅           | ✅                 | ✅           |
+| Login con JWT         | ✅           | ✅                 | ✅           |
+| Perfil de usuario     | ✅           | ✅                 | ✅           |
+| Actualizar perfil     | ✅           | ❌                 | **FALTA**    |
+| **Productos**         | ✅           | ✅                 | **PARCIAL**  |
+| CRUD productos        | ✅           | ✅                 | ✅           |
+| Búsqueda/filtros      | ✅           | ✅                 | ✅           |
+| Reseñas               | ✅           | ✅                 | ✅           |
+| Top productos         | ✅           | ❌                 | **FALTA**    |
+| Rating promedio       | ✅           | ❌                 | **FALTA**    |
+| Upload de imágenes    | ✅           | ❌                 | **FALTA**    |
+| **Órdenes/Pedidos**   | ✅           | ❌                 | **FALTA**    |
+| Crear orden           | ✅           | ❌                 | **FALTA**    |
+| Ver mis órdenes       | ✅           | ❌                 | **FALTA**    |
+| Ver orden por ID      | ✅           | ❌                 | **FALTA**    |
+| Marcar como pagado    | ✅           | ❌                 | **FALTA**    |
+| Marcar como entregado | ✅           | ❌                 | **FALTA**    |
+| **Panel Admin**       | ✅           | ❌                 | **FALTA**    |
+| Listar usuarios       | ✅           | ❌                 | **FALTA**    |
+| Eliminar usuario      | ✅           | ❌                 | **FALTA**    |
+| Actualizar usuario    | ✅           | ❌                 | **FALTA**    |
+| Listar órdenes        | ✅           | ❌                 | **FALTA**    |
+| **Sistema de Pagos**  | ✅           | ❌                 | **FALTA**    |
+| PayPal integration    | ✅           | ❌                 | **FALTA**    |
+| **Sistema de Roles**  | ✅           | ❌                 | **FALTA**    |
+| isAdmin flag          | ✅           | ❌                 | **FALTA**    |
+| Admin middleware      | ✅           | ❌                 | **FALTA**    |
 
 #### Resumen de Completitud
 
@@ -212,41 +220,41 @@ POR IMPLEMENTAR: ░░░░░░░░░░░░█████████
 
 #### A. User Model
 
-| Campo | ProShop | Vegan Vita | Notas |
-|-------|---------|-----------|-------|
-| id/\_id | ✅ ObjectId | ✅ UUID | ✅ Ambos OK |
-| name | ✅ String | ✅ String | ✅ Igual |
-| email | ✅ String unique | ✅ String unique | ✅ Igual |
-| password | ✅ String hashed | ✅ String hashed | ✅ Igual |
-| **isAdmin** | ✅ Boolean | ❌ **FALTA** | ⚠️ **Crítico para roles** |
-| createdAt | ✅ Timestamp | ✅ Timestamp | ✅ Igual |
-| updatedAt | ✅ Timestamp | ✅ Timestamp | ✅ Igual |
+| Campo       | ProShop          | Vegan Vita       | Notas                     |
+| ----------- | ---------------- | ---------------- | ------------------------- |
+| id/\_id     | ✅ ObjectId      | ✅ UUID          | ✅ Ambos OK               |
+| name        | ✅ String        | ✅ String        | ✅ Igual                  |
+| email       | ✅ String unique | ✅ String unique | ✅ Igual                  |
+| password    | ✅ String hashed | ✅ String hashed | ✅ Igual                  |
+| **isAdmin** | ✅ Boolean       | ❌ **FALTA**     | ⚠️ **Crítico para roles** |
+| createdAt   | ✅ Timestamp     | ✅ Timestamp     | ✅ Igual                  |
+| updatedAt   | ✅ Timestamp     | ✅ Timestamp     | ✅ Igual                  |
 
 **🔴 CRÍTICO:** Falta el campo `isAdmin` para sistema de roles.
 
 #### B. Product Model
 
-| Campo | ProShop | Vegan Vita | Notas |
-|-------|---------|-----------|-------|
-| name | ✅ String | ✅ String | ✅ Igual |
-| slug | ❌ No tiene | ✅ String unique | ✅ **Mejora en Vegan Vita** |
-| description | ✅ String | ✅ Text | ✅ Igual |
-| price | ✅ Number | ✅ Decimal(10,2) | ✅ Mejor precisión en VV |
-| image | ✅ String | ✅ String | ✅ Igual |
-| **brand** | ✅ String | ❌ **FALTA** | ⚠️ Útil para filtrado |
-| category | ✅ String | ✅ Relation | ✅ **Mejor en Vegan Vita** |
-| stock/countInStock | ✅ Number | ✅ Number | ✅ Igual |
-| **rating** | ✅ Number | ❌ **FALTA** | ⚠️ **Rating promedio calculado** |
-| **numReviews** | ✅ Number | ❌ **FALTA** | ⚠️ **Contador de reseñas** |
-| reviews | ✅ Embedded | ✅ Relation | ✅ Igual (diferente enfoque) |
-| user (owner) | ✅ Ref User | ❌ **FALTA** | ⚠️ Quién creó el producto |
+| Campo              | ProShop     | Vegan Vita       | Notas                            |
+| ------------------ | ----------- | ---------------- | -------------------------------- |
+| name               | ✅ String   | ✅ String        | ✅ Igual                         |
+| slug               | ❌ No tiene | ✅ String unique | ✅ **Mejora en Vegan Vita**      |
+| description        | ✅ String   | ✅ Text          | ✅ Igual                         |
+| price              | ✅ Number   | ✅ Decimal(10,2) | ✅ Mejor precisión en VV         |
+| image              | ✅ String   | ✅ String        | ✅ Igual                         |
+| **brand**          | ✅ String   | ❌ **FALTA**     | ⚠️ Útil para filtrado            |
+| category           | ✅ String   | ✅ Relation      | ✅ **Mejor en Vegan Vita**       |
+| stock/countInStock | ✅ Number   | ✅ Number        | ✅ Igual                         |
+| **rating**         | ✅ Number   | ❌ **FALTA**     | ⚠️ **Rating promedio calculado** |
+| **numReviews**     | ✅ Number   | ❌ **FALTA**     | ⚠️ **Contador de reseñas**       |
+| reviews            | ✅ Embedded | ✅ Relation      | ✅ Igual (diferente enfoque)     |
+| user (owner)       | ✅ Ref User | ❌ **FALTA**     | ⚠️ Quién creó el producto        |
 
 **🟡 IMPORTANTE:** Faltan campos calculados `rating` y `numReviews`.
 
 #### C. Order Model
 
-| Estado | ProShop | Vegan Vita |
-|--------|---------|-----------|
+| Estado             | ProShop         | Vegan Vita       |
+| ------------------ | --------------- | ---------------- |
 | **Implementación** | ✅ **COMPLETO** | ❌ **NO EXISTE** |
 
 **Estructura de Order en ProShop:**
@@ -296,51 +304,51 @@ POR IMPLEMENTAR: ░░░░░░░░░░░░█████████
 
 #### A. Auth/User Endpoints
 
-| Endpoint | Método | ProShop | Vegan Vita | Prioridad |
-|----------|--------|---------|-----------|-----------|
-| Registro | POST | `/api/users` | `/api/auth/register` | ✅ OK |
-| Login | POST | `/api/users/login` | `/api/auth/login` | ✅ OK |
-| Obtener perfil | GET | `/api/users/profile` | `/api/auth/me` | ✅ OK |
-| **Actualizar perfil** | PUT | `/api/users/profile` | ❌ | 🟡 **ALTA** |
-| **Listar usuarios (Admin)** | GET | `/api/users` | ❌ | 🟡 **ALTA** |
-| **Obtener usuario por ID** | GET | `/api/users/:id` | ❌ | 🟡 **MEDIA** |
-| **Actualizar usuario (Admin)** | PUT | `/api/users/:id` | ❌ | 🟡 **MEDIA** |
-| **Eliminar usuario (Admin)** | DELETE | `/api/users/:id` | ❌ | 🟡 **MEDIA** |
+| Endpoint                       | Método | ProShop              | Vegan Vita           | Prioridad    |
+| ------------------------------ | ------ | -------------------- | -------------------- | ------------ |
+| Registro                       | POST   | `/api/users`         | `/api/auth/register` | ✅ OK        |
+| Login                          | POST   | `/api/users/login`   | `/api/auth/login`    | ✅ OK        |
+| Obtener perfil                 | GET    | `/api/users/profile` | `/api/auth/me`       | ✅ OK        |
+| **Actualizar perfil**          | PUT    | `/api/users/profile` | ❌                   | 🟡 **ALTA**  |
+| **Listar usuarios (Admin)**    | GET    | `/api/users`         | ❌                   | 🟡 **ALTA**  |
+| **Obtener usuario por ID**     | GET    | `/api/users/:id`     | ❌                   | 🟡 **MEDIA** |
+| **Actualizar usuario (Admin)** | PUT    | `/api/users/:id`     | ❌                   | 🟡 **MEDIA** |
+| **Eliminar usuario (Admin)**   | DELETE | `/api/users/:id`     | ❌                   | 🟡 **MEDIA** |
 
 #### B. Product Endpoints
 
-| Endpoint | Método | ProShop | Vegan Vita | Prioridad |
-|----------|--------|---------|-----------|-----------|
-| Listar productos | GET | `/api/products` | `/api/products` | ✅ OK |
-| Obtener producto | GET | `/api/products/:id` | `/api/products/:slug` | ✅ OK |
-| Crear producto | POST | `/api/products` | `/api/products` | ✅ OK |
-| Actualizar producto | PUT | `/api/products/:id` | `/api/products/:id` | ✅ OK |
-| Eliminar producto | DELETE | `/api/products/:id` | `/api/products/:id` | ✅ OK |
-| Crear reseña | POST | `/api/products/:id/reviews` | `/api/products/:id/reviews` | ✅ OK |
-| **Top productos** | GET | `/api/products/top` | ❌ | 🟢 **BAJA** |
+| Endpoint            | Método | ProShop                     | Vegan Vita                  | Prioridad   |
+| ------------------- | ------ | --------------------------- | --------------------------- | ----------- |
+| Listar productos    | GET    | `/api/products`             | `/api/products`             | ✅ OK       |
+| Obtener producto    | GET    | `/api/products/:id`         | `/api/products/:slug`       | ✅ OK       |
+| Crear producto      | POST   | `/api/products`             | `/api/products`             | ✅ OK       |
+| Actualizar producto | PUT    | `/api/products/:id`         | `/api/products/:id`         | ✅ OK       |
+| Eliminar producto   | DELETE | `/api/products/:id`         | `/api/products/:id`         | ✅ OK       |
+| Crear reseña        | POST   | `/api/products/:id/reviews` | `/api/products/:id/reviews` | ✅ OK       |
+| **Top productos**   | GET    | `/api/products/top`         | ❌                          | 🟢 **BAJA** |
 
 #### C. Order Endpoints
 
-| Endpoint | Método | ProShop | Vegan Vita | Prioridad |
-|----------|--------|---------|-----------|-----------|
-| **Crear orden** | POST | `/api/orders` | ❌ | 🔴 **CRÍTICA** |
-| **Ver mis órdenes** | GET | `/api/orders/myorders` | ❌ | 🔴 **CRÍTICA** |
-| **Ver orden por ID** | GET | `/api/orders/:id` | ❌ | 🔴 **CRÍTICA** |
-| **Listar órdenes (Admin)** | GET | `/api/orders` | ❌ | 🟡 **ALTA** |
-| **Marcar como pagado** | PUT | `/api/orders/:id/pay` | ❌ | 🔴 **CRÍTICA** |
-| **Marcar como entregado** | PUT | `/api/orders/:id/deliver` | ❌ | 🟡 **ALTA** |
+| Endpoint                   | Método | ProShop                   | Vegan Vita | Prioridad      |
+| -------------------------- | ------ | ------------------------- | ---------- | -------------- |
+| **Crear orden**            | POST   | `/api/orders`             | ❌         | 🔴 **CRÍTICA** |
+| **Ver mis órdenes**        | GET    | `/api/orders/myorders`    | ❌         | 🔴 **CRÍTICA** |
+| **Ver orden por ID**       | GET    | `/api/orders/:id`         | ❌         | 🔴 **CRÍTICA** |
+| **Listar órdenes (Admin)** | GET    | `/api/orders`             | ❌         | 🟡 **ALTA**    |
+| **Marcar como pagado**     | PUT    | `/api/orders/:id/pay`     | ❌         | 🔴 **CRÍTICA** |
+| **Marcar como entregado**  | PUT    | `/api/orders/:id/deliver` | ❌         | 🟡 **ALTA**    |
 
 #### D. Upload Endpoints
 
-| Endpoint | Método | ProShop | Vegan Vita | Prioridad |
-|----------|--------|---------|-----------|-----------|
-| **Upload imagen** | POST | `/api/upload` | ❌ | 🟡 **MEDIA** |
+| Endpoint          | Método | ProShop       | Vegan Vita | Prioridad    |
+| ----------------- | ------ | ------------- | ---------- | ------------ |
+| **Upload imagen** | POST   | `/api/upload` | ❌         | 🟡 **MEDIA** |
 
 #### E. Config Endpoints
 
-| Endpoint | Método | ProShop | Vegan Vita | Prioridad |
-|----------|--------|---------|-----------|-----------|
-| **PayPal Client ID** | GET | `/api/config/paypal` | ❌ | 🟡 **MEDIA** |
+| Endpoint             | Método | ProShop              | Vegan Vita | Prioridad    |
+| -------------------- | ------ | -------------------- | ---------- | ------------ |
+| **PayPal Client ID** | GET    | `/api/config/paypal` | ❌         | 🟡 **MEDIA** |
 
 ---
 
@@ -350,16 +358,16 @@ POR IMPLEMENTAR: ░░░░░░░░░░░░█████████
 
 ```javascript
 // authMiddleware.js
-- protect()       // Verifica JWT, inyecta req.user
-- admin()         // Verifica req.user.isAdmin === true
+-protect() - // Verifica JWT, inyecta req.user
+  admin(); // Verifica req.user.isAdmin === true
 ```
 
 #### Vegan Vita Backend
 
 ```typescript
 // Guards
-- JwtAuthGuard    // Verifica JWT, inyecta req.user
-- AdminGuard      // ❌ NO EXISTE
+-JwtAuthGuard - // Verifica JWT, inyecta req.user
+  AdminGuard; // ❌ NO EXISTE
 ```
 
 **🔴 FALTA:** Guard de administrador.
@@ -402,7 +410,10 @@ export class Order {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @OneToMany(() => OrderItem, (item) => item.order, { eager: true, cascade: true })
+  @OneToMany(() => OrderItem, (item) => item.order, {
+    eager: true,
+    cascade: true,
+  })
   orderItems: OrderItem[];
 
   @Column({ type: 'jsonb' })
@@ -502,42 +513,105 @@ export class OrderItem {
 
 ---
 
-#### 2. Sistema de Pagos (PayPal/Stripe)
+#### 2. Sistema de Pagos (MODO DUMMY/MOCK)
 
-**Descripción:** Integración con pasarela de pagos.
+**Descripción:** Sistema de pagos simulado para desarrollo/testing (API no irá a producción inicialmente).
 
-**Opciones:**
+**⚠️ DECISIÓN DE ARQUITECTURA:**
 
-1. **PayPal** (como ProShop)
-   - Instalar: `npm install @paypal/checkout-server-sdk`
-   - Configurar credenciales en `.env`
-   - Endpoint: `GET /api/config/paypal` (retorna clientId)
+- **NO se integrará PayPal/Stripe real** por el momento
+- Se implementará un sistema **DUMMY/MOCK** que simule pagos
+- Permitirá completar el flujo de órdenes sin procesar pagos reales
+- Ideal para desarrollo frontend y testing
 
-2. **Stripe** (alternativa moderna)
-   - Instalar: `npm install stripe @nestjs/stripe`
-   - Mejor experiencia de desarrollo
-   - Más usado en 2025
+**Implementación DUMMY:**
 
 **Componentes a crear:**
 
 ```
 src/payments/
 ├── payments.module.ts
-├── payments.service.ts
+├── payments-mock.service.ts   // 🆕 Servicio simulado
 ├── payments.controller.ts
 └── dto/
-    └── process-payment.dto.ts
+    ├── process-payment.dto.ts
+    └── payment-response.dto.ts
+```
+
+**PaymentsMockService:**
+
+```typescript
+@Injectable()
+export class PaymentsMockService {
+  async processPayment(
+    orderId: string,
+    amount: number,
+  ): Promise<PaymentResponse> {
+    // Simular delay de red
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Simular éxito aleatorio (90% éxito, 10% fallo)
+    const isSuccess = Math.random() > 0.1;
+
+    return {
+      success: isSuccess,
+      transactionId: `DUMMY_TXN_${Date.now()}_${orderId}`,
+      amount,
+      status: isSuccess ? 'approved' : 'failed',
+      message: isSuccess ? 'Pago simulado exitoso' : 'Pago simulado fallido',
+    };
+  }
+
+  async simulateSuccess(
+    orderId: string,
+    amount: number,
+  ): Promise<PaymentResponse> {
+    return {
+      success: true,
+      transactionId: `DUMMY_SUCCESS_${Date.now()}_${orderId}`,
+      amount,
+      status: 'approved',
+      message: 'Pago forzado como exitoso (modo testing)',
+    };
+  }
+
+  async simulateFailure(orderId: string): Promise<PaymentResponse> {
+    return {
+      success: false,
+      transactionId: null,
+      amount: 0,
+      status: 'failed',
+      message: 'Pago forzado como fallido (modo testing)',
+    };
+  }
+}
 ```
 
 **Endpoints a implementar:**
 
 ```typescript
-@Get('config/paypal')          // Obtener PayPal Client ID
-@Post('process-payment')       // Procesar pago
-@Post('webhooks/paypal')       // Webhook de PayPal
+@Post('process-payment')           // Procesar pago simulado
+@Post('simulate-success')          // Forzar éxito (testing)
+@Post('simulate-failure')          // Forzar fallo (testing)
+@Get('status/:transactionId')     // Consultar estado de transacción
 ```
 
-**Estimación:** 3-4 días full-time
+**Variables de entorno:**
+
+```env
+# Modo de pagos: 'dummy' o 'stripe' (futuro)
+PAYMENTS_MODE=dummy
+```
+
+**Estimación:** 6-8 horas (1 día)
+
+**Ventajas del enfoque DUMMY:**
+
+- ✅ Rápida implementación
+- ✅ No requiere cuentas de PayPal/Stripe
+- ✅ Perfecto para desarrollo frontend
+- ✅ Permite testing completo del flujo
+- ✅ Fácil migración a Stripe/PayPal en el futuro
 
 ---
 
@@ -555,7 +629,7 @@ export class User {
   // ... campos existentes ...
 
   @Column({ type: 'boolean', default: false })
-  isAdmin: boolean;  // 🆕 NUEVO CAMPO
+  isAdmin: boolean; // 🆕 NUEVO CAMPO
 }
 ```
 
@@ -563,7 +637,12 @@ export class User {
 
 ```typescript
 // src/auth/guards/admin.guard.ts
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  CanActivate,
+  ExecutionContext,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Observable } from 'rxjs';
 
 @Injectable()
@@ -575,7 +654,9 @@ export class AdminGuard implements CanActivate {
     const user = request.user;
 
     if (!user || !user.isAdmin) {
-      throw new ForbiddenException('Acceso denegado: se requieren permisos de administrador');
+      throw new ForbiddenException(
+        'Acceso denegado: se requieren permisos de administrador',
+      );
     }
 
     return true;
@@ -690,7 +771,12 @@ export class UpdateProfileDto {
 
 ```typescript
 // upload.controller.ts
-import { Controller, Post, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 
@@ -702,7 +788,8 @@ export class UploadController {
       storage: diskStorage({
         destination: './uploads',
         filename: (req, file, cb) => {
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
           cb(null, `${uniqueSuffix}-${file.originalname}`);
         },
       }),
@@ -739,7 +826,7 @@ export class CreateProductDto {
 
   @IsString()
   @IsOptional()
-  brand?: string;  // 🆕 NUEVO CAMPO
+  brand?: string; // 🆕 NUEVO CAMPO
 }
 ```
 
@@ -836,6 +923,7 @@ async findTopRated(limit: number = 3): Promise<Product[]> {
 #### Día 1: Setup y Sistema de Roles
 
 **Tareas:**
+
 1. ✅ Agregar campo `isAdmin` a User.entity.ts
 2. ✅ Crear migración para agregar columna
 3. ✅ Crear AdminGuard
@@ -843,6 +931,7 @@ async findTopRated(limit: number = 3): Promise<Product[]> {
 5. ✅ Crear usuario admin en seeder
 
 **Entregables:**
+
 - [user.entity.ts](src/auth/entities/user.entity.ts) actualizado
 - [admin.guard.ts](src/auth/guards/admin.guard.ts) creado
 - Tests pasando
@@ -854,6 +943,7 @@ async findTopRated(limit: number = 3): Promise<Product[]> {
 #### Día 2-3: Gestión de Usuarios
 
 **Tareas:**
+
 1. ✅ Crear UsersModule
 2. ✅ Implementar UsersController con endpoints admin
 3. ✅ Implementar actualización de perfil
@@ -861,6 +951,7 @@ async findTopRated(limit: number = 3): Promise<Product[]> {
 5. ✅ Documentar endpoints
 
 **Endpoints a implementar:**
+
 ```
 PUT    /api/auth/profile        - Actualizar perfil propio
 GET    /api/users               - Listar usuarios (Admin)
@@ -878,6 +969,7 @@ DELETE /api/users/:id           - Eliminar usuario (Admin)
 #### Día 4-5: Modelos y Relaciones
 
 **Tareas:**
+
 1. ✅ Crear Order.entity.ts
 2. ✅ Crear OrderItem.entity.ts
 3. ✅ Configurar relaciones TypeORM
@@ -885,6 +977,7 @@ DELETE /api/users/:id           - Eliminar usuario (Admin)
 5. ✅ Crear migración de base de datos
 
 **Entregables:**
+
 - [order.entity.ts](src/orders/entities/order.entity.ts)
 - [order-item.entity.ts](src/orders/entities/order-item.entity.ts)
 - DTOs completos
@@ -896,6 +989,7 @@ DELETE /api/users/:id           - Eliminar usuario (Admin)
 #### Día 6-7: Lógica de Negocio
 
 **Tareas:**
+
 1. ✅ Crear OrdersService
 2. ✅ Implementar createOrder()
    - Validar stock de productos
@@ -909,6 +1003,7 @@ DELETE /api/users/:id           - Eliminar usuario (Admin)
 7. ✅ Implementar getOrders() (Admin)
 
 **Validaciones importantes:**
+
 - Stock suficiente antes de crear orden
 - Usuario solo puede ver sus propias órdenes
 - Admin puede ver todas las órdenes
@@ -920,6 +1015,7 @@ DELETE /api/users/:id           - Eliminar usuario (Admin)
 #### Día 8: Controller y Tests
 
 **Tareas:**
+
 1. ✅ Crear OrdersController
 2. ✅ Implementar todos los endpoints
 3. ✅ Aplicar guards (JWT, Admin)
@@ -927,6 +1023,7 @@ DELETE /api/users/:id           - Eliminar usuario (Admin)
 5. ✅ Escribir tests E2E (endpoints)
 
 **Endpoints:**
+
 ```
 POST   /api/orders              - Crear orden
 GET    /api/orders/myorders     - Mis órdenes
@@ -945,6 +1042,7 @@ GET    /api/orders              - Todas las órdenes (Admin)
 #### Día 9-10: Integración PayPal
 
 **Tareas:**
+
 1. ✅ Instalar SDK de PayPal
 2. ✅ Configurar variables de entorno
 3. ✅ Crear PaymentsModule
@@ -953,6 +1051,7 @@ GET    /api/orders              - Todas las órdenes (Admin)
 6. ✅ Implementar validación de pago
 
 **Variables de entorno (.env):**
+
 ```env
 PAYPAL_CLIENT_ID=your-client-id
 PAYPAL_CLIENT_SECRET=your-secret
@@ -966,6 +1065,7 @@ PAYPAL_MODE=sandbox  # o production
 #### Día 11-12: Testing de Pagos
 
 **Tareas:**
+
 1. ✅ Configurar PayPal Sandbox
 2. ✅ Crear cuentas de prueba
 3. ✅ Probar flujo completo de pago
@@ -983,6 +1083,7 @@ PAYPAL_MODE=sandbox  # o production
 **Opción A: Local Storage (rápido)**
 
 **Tareas:**
+
 1. ✅ Instalar multer
 2. ✅ Crear UploadModule
 3. ✅ Configurar storage local
@@ -996,6 +1097,7 @@ PAYPAL_MODE=sandbox  # o production
 **Opción B: Cloudinary (recomendado para producción)**
 
 **Tareas:**
+
 1. ✅ Crear cuenta Cloudinary
 2. ✅ Instalar cloudinary SDK
 3. ✅ Configurar credenciales
@@ -1009,6 +1111,7 @@ PAYPAL_MODE=sandbox  # o production
 #### Día 15-16: Mejoras en Productos
 
 **Tareas:**
+
 1. ✅ Agregar campo `brand` a Product
 2. ✅ Agregar campos `rating` y `numReviews`
 3. ✅ Implementar cálculo automático de rating
@@ -1023,6 +1126,7 @@ PAYPAL_MODE=sandbox  # o production
 #### Día 17: Dashboard Admin
 
 **Tareas:**
+
 1. ✅ Crear endpoint GET /api/stats/overview
    - Total de ventas
    - Total de usuarios
@@ -1042,6 +1146,7 @@ PAYPAL_MODE=sandbox  # o production
 #### Día 18-19: Testing Completo
 
 **Tareas:**
+
 1. ✅ Completar tests unitarios
    - OrdersService (100% cobertura)
    - PaymentsService (100% cobertura)
@@ -1054,6 +1159,7 @@ PAYPAL_MODE=sandbox  # o production
 4. ✅ Alcanzar 80%+ cobertura
 
 **Comando:**
+
 ```bash
 npm run test:cov
 ```
@@ -1065,6 +1171,7 @@ npm run test:cov
 #### Día 20: Documentación
 
 **Tareas:**
+
 1. ✅ Actualizar README.md
 2. ✅ Documentar endpoints con Swagger
    - Instalar @nestjs/swagger
@@ -1076,6 +1183,7 @@ npm run test:cov
 6. ✅ Crear CHANGELOG.md
 
 **Swagger Config:**
+
 ```typescript
 // main.ts
 const config = new DocumentBuilder()
@@ -1097,37 +1205,37 @@ SwaggerModule.setup('api/docs', app, document);
 
 ### 6.1 Resumen por Fase
 
-| Fase | Descripción | Días | Horas | Prioridad |
-|------|-------------|------|-------|-----------|
-| **Fase 1** | Preparación y Roles | 2-3 | 16-22 | 🔴 Crítica |
-| **Fase 2** | Sistema de Órdenes | 4-5 | 34-44 | 🔴 Crítica |
-| **Fase 3** | Sistema de Pagos | 3-4 | 24-30 | 🔴 Crítica |
-| **Fase 4** | Features Adicionales | 4-5 | 36-46 | 🟡 Alta |
-| **Fase 5** | Testing y Docs | 2-3 | 22-26 | 🟡 Alta |
-| **TOTAL** | **Proyecto Completo** | **18-24** | **132-168** | - |
+| Fase       | Descripción           | Días      | Horas       | Prioridad  |
+| ---------- | --------------------- | --------- | ----------- | ---------- |
+| **Fase 1** | Preparación y Roles   | 2-3       | 16-22       | 🔴 Crítica |
+| **Fase 2** | Sistema de Órdenes    | 4-5       | 34-44       | 🔴 Crítica |
+| **Fase 3** | Sistema de Pagos      | 3-4       | 24-30       | 🔴 Crítica |
+| **Fase 4** | Features Adicionales  | 4-5       | 36-46       | 🟡 Alta    |
+| **Fase 5** | Testing y Docs        | 2-3       | 22-26       | 🟡 Alta    |
+| **TOTAL**  | **Proyecto Completo** | **18-24** | **132-168** | -          |
 
 ### 6.2 Estimación por Funcionalidad
 
-| Funcionalidad | Complejidad | Tiempo | Prioridad |
-|--------------|-------------|---------|-----------|
-| Sistema de roles (isAdmin) | Baja | 6h | 🔴 Crítica |
-| AdminGuard | Baja | 2h | 🔴 Crítica |
-| Gestión de usuarios | Media | 12h | 🟡 Alta |
-| Actualización de perfil | Baja | 4h | 🟡 Alta |
-| Modelo Order completo | Alta | 12h | 🔴 Crítica |
-| OrdersService | Alta | 16h | 🔴 Crítica |
-| OrdersController | Media | 8h | 🔴 Crítica |
-| Tests de órdenes | Media | 10h | 🟡 Alta |
-| Integración PayPal | Alta | 16h | 🔴 Crítica |
-| Testing de pagos | Media | 10h | 🟡 Alta |
-| Upload de imágenes (local) | Baja | 8h | 🟢 Media |
-| Upload de imágenes (Cloudinary) | Media | 12h | 🟢 Media |
-| Campo brand en productos | Baja | 4h | 🟢 Media |
-| Rating y numReviews | Media | 8h | 🟢 Baja |
-| Top productos | Baja | 4h | 🟢 Baja |
-| Estadísticas admin | Media | 10h | 🟢 Baja |
-| Documentación Swagger | Media | 8h | 🟡 Alta |
-| Tests completos | Alta | 20h | 🟡 Alta |
+| Funcionalidad                   | Complejidad | Tiempo | Prioridad  |
+| ------------------------------- | ----------- | ------ | ---------- |
+| Sistema de roles (isAdmin)      | Baja        | 6h     | 🔴 Crítica |
+| AdminGuard                      | Baja        | 2h     | 🔴 Crítica |
+| Gestión de usuarios             | Media       | 12h    | 🟡 Alta    |
+| Actualización de perfil         | Baja        | 4h     | 🟡 Alta    |
+| Modelo Order completo           | Alta        | 12h    | 🔴 Crítica |
+| OrdersService                   | Alta        | 16h    | 🔴 Crítica |
+| OrdersController                | Media       | 8h     | 🔴 Crítica |
+| Tests de órdenes                | Media       | 10h    | 🟡 Alta    |
+| Integración PayPal              | Alta        | 16h    | 🔴 Crítica |
+| Testing de pagos                | Media       | 10h    | 🟡 Alta    |
+| Upload de imágenes (local)      | Baja        | 8h     | 🟢 Media   |
+| Upload de imágenes (Cloudinary) | Media       | 12h    | 🟢 Media   |
+| Campo brand en productos        | Baja        | 4h     | 🟢 Media   |
+| Rating y numReviews             | Media       | 8h     | 🟢 Baja    |
+| Top productos                   | Baja        | 4h     | 🟢 Baja    |
+| Estadísticas admin              | Media       | 10h    | 🟢 Baja    |
+| Documentación Swagger           | Media       | 8h     | 🟡 Alta    |
+| Tests completos                 | Alta        | 20h    | 🟡 Alta    |
 
 ### 6.3 Escenarios de Desarrollo
 
@@ -1166,11 +1274,13 @@ FIN: Día 40 ✅
 #### Escenario C: Solo Funcionalidades Críticas
 
 **Incluye:**
+
 - ✅ Sistema de roles
 - ✅ Sistema de órdenes
 - ✅ Sistema de pagos
 
 **Excluye:**
+
 - ❌ Upload de imágenes
 - ❌ Estadísticas
 - ❌ Top productos
@@ -1260,13 +1370,15 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    const status = exception instanceof HttpException
-      ? exception.getStatus()
-      : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status =
+      exception instanceof HttpException
+        ? exception.getStatus()
+        : HttpStatus.INTERNAL_SERVER_ERROR;
 
-    const message = exception instanceof HttpException
-      ? exception.message
-      : 'Internal server error';
+    const message =
+      exception instanceof HttpException
+        ? exception.message
+        : 'Internal server error';
 
     response.status(status).json({
       statusCode: status,
@@ -1309,7 +1421,7 @@ WinstonModule.forRoot({
       ),
     }),
   ],
-})
+});
 ```
 
 ---
@@ -1870,6 +1982,7 @@ docker exec -i vegan_vita_db psql -U postgres vegan_vita_dev < backup.sql
 Tu proyecto **Vegan Vita Backend** está en un **excelente estado de partida**:
 
 ✅ **Fortalezas:**
+
 - Arquitectura NestJS bien estructurada
 - Sistema de autenticación robusto con JWT
 - Productos con búsqueda y filtrado avanzado
@@ -1880,6 +1993,7 @@ Tu proyecto **Vegan Vita Backend** está en un **excelente estado de partida**:
 - Validación de DTOs completa
 
 ⚠️ **Áreas de Mejora:**
+
 - Sistema de órdenes (funcionalidad crítica)
 - Sistema de pagos (funcionalidad crítica)
 - Sistema de roles y permisos
@@ -1890,16 +2004,19 @@ Tu proyecto **Vegan Vita Backend** está en un **excelente estado de partida**:
 ### 11.2 Recomendación de Implementación
 
 **OPCIÓN A: Implementación Completa (Recomendada)**
+
 - Duración: 18-24 días full-time
 - Incluye: Todas las funcionalidades
 - Resultado: E-commerce completamente funcional
 
 **OPCIÓN B: MVP Funcional (Rápida)**
+
 - Duración: 14 días full-time
 - Incluye: Roles + Órdenes + Pagos
 - Resultado: E-commerce básico pero funcional
 
 **OPCIÓN C: Incremental (Flexible)**
+
 - Implementa por fases según prioridades
 - Permite ajustar según feedback
 - Ideal para desarrollo ágil

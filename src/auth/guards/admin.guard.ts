@@ -16,7 +16,7 @@ export class AdminGuard implements CanActivate {
 
     if (!user || !user.isAdmin) {
       throw new ForbiddenException(
-        'Acceso denegado: se requieren permisos de administrador',
+        'Access denied: administrator permissions required',
       );
     }
 

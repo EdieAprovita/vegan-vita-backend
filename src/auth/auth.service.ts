@@ -20,17 +20,17 @@ export class AuthService {
   async register(registerDto: RegisterDto) {
     const { email } = registerDto;
 
-    // Verificar si el usuario ya existe
+    // Check if user already exists
     const existingUser = await this.usersService.findByEmail(email);
 
     if (existingUser) {
-      throw new ConflictException('El email ya está registrado');
+      throw new ConflictException('Email is already registered');
     }
 
-    // Crear el nuevo usuario (UsersService se encarga del hashing)
+    // Create the new user (UsersService handles password hashing)
     const user = await this.usersService.create(registerDto);
 
-    // Generar JWT
+    // Generate JWT
     const token = this.jwtService.sign(
       { id: user.id, email: user.email },
       {
@@ -39,7 +39,7 @@ export class AuthService {
       },
     );
 
-    // Retornar usuario sin contraseña y token
+    // Return user without password and token
     return {
       user: {
         id: user.id,
@@ -53,21 +53,21 @@ export class AuthService {
   async login(loginDto: LoginDto) {
     const { email, password } = loginDto;
 
-    // Buscar al usuario por email
+    // Find user by email
     const user = await this.usersService.findByEmail(email);
 
     if (!user) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Verificar la contraseña
+    // Verify password
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Credenciales inválidas');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Generar JWT
+    // Generate JWT
     const token = this.jwtService.sign(
       { id: user.id, email: user.email },
       {
@@ -76,7 +76,7 @@ export class AuthService {
       },
     );
 
-    // Retornar usuario sin contraseña y token
+    // Return user without password and token
     return {
       user: {
         id: user.id,

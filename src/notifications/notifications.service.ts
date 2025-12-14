@@ -93,7 +93,7 @@ export class NotificationsService {
       const html = template({
         userName: order.user.name,
         orderId: order.id,
-        orderDate: new Date(order.createdAt).toLocaleDateString('es-ES'),
+        orderDate: new Date(order.createdAt).toLocaleDateString('en-US'),
         status: this.getStatusMessage(order.status),
         items,
         itemsPrice: Number(order.itemsPrice).toFixed(2),
@@ -108,7 +108,7 @@ export class NotificationsService {
       await this.transporter.sendMail({
         from: this.configService.get<string>('SMTP_FROM'),
         to: order.user.email,
-        subject: `Confirmación de Pedido #${order.id.substring(0, 8)}`,
+        subject: `Order Confirmation #${order.id.substring(0, 8)}`,
         html,
       });
 
@@ -148,7 +148,7 @@ export class NotificationsService {
       const html = template({
         userName: order.user.name,
         orderId: order.id,
-        updateDate: new Date().toLocaleDateString('es-ES'),
+        updateDate: new Date().toLocaleDateString('en-US'),
         status: statusMessage,
         statusClass,
         statusMessage,
@@ -160,7 +160,7 @@ export class NotificationsService {
       await this.transporter.sendMail({
         from: this.configService.get<string>('SMTP_FROM'),
         to: order.user.email,
-        subject: `Actualización de Pedido #${order.id.substring(0, 8)} - ${statusMessage}`,
+        subject: `Order Update #${order.id.substring(0, 8)} - ${statusMessage}`,
         html,
       });
 
@@ -194,7 +194,7 @@ export class NotificationsService {
       const html = template({
         userName: order.user.name,
         orderId: order.id,
-        deliveryDate: new Date(order.deliveredAt).toLocaleDateString('es-ES'),
+        deliveryDate: new Date(order.deliveredAt).toLocaleDateString('en-US'),
         shippingAddress: order.shippingAddress,
         orderUrl: `${this.configService.get('FRONTEND_URL')}/orders/${order.id}`,
         reviewUrl: `${this.configService.get('FRONTEND_URL')}/orders/${order.id}/review`,
@@ -203,7 +203,7 @@ export class NotificationsService {
       await this.transporter.sendMail({
         from: this.configService.get<string>('SMTP_FROM'),
         to: order.user.email,
-        subject: `¡Tu pedido #${order.id.substring(0, 8)} ha sido Entregado! 🎉`,
+        subject: `Your Order #${order.id.substring(0, 8)} has been Delivered! 🎉`,
         html,
       });
 
@@ -221,12 +221,12 @@ export class NotificationsService {
 
   private getStatusMessage(status: OrderStatus): string {
     const messages: Record<OrderStatus, string> = {
-      [OrderStatus.PENDING]: 'Pendiente',
-      [OrderStatus.PROCESSING]: 'Procesando',
-      [OrderStatus.PAID]: 'Pagado',
-      [OrderStatus.SHIPPED]: 'Enviado',
-      [OrderStatus.DELIVERED]: 'Entregado',
-      [OrderStatus.CANCELLED]: 'Cancelado',
+      [OrderStatus.PENDING]: 'Pending',
+      [OrderStatus.PROCESSING]: 'Processing',
+      [OrderStatus.PAID]: 'Paid',
+      [OrderStatus.SHIPPED]: 'Shipped',
+      [OrderStatus.DELIVERED]: 'Delivered',
+      [OrderStatus.CANCELLED]: 'Cancelled',
     };
 
     return messages[status] || status;
@@ -237,30 +237,29 @@ export class NotificationsService {
     newStatus: OrderStatus,
   ): string {
     const messages: Partial<Record<OrderStatus, string>> = {
-      [OrderStatus.PROCESSING]:
-        'Tu pedido está siendo procesado por nuestro equipo.',
+      [OrderStatus.PROCESSING]: 'Your order is being processed by our team.',
       [OrderStatus.PAID]:
-        'Hemos confirmado tu pago. Tu pedido será enviado pronto.',
+        'We have confirmed your payment. Your order will be shipped soon.',
       [OrderStatus.SHIPPED]:
-        'Tu pedido ha sido enviado y está en camino a tu dirección.',
-      [OrderStatus.DELIVERED]: '¡Tu pedido ha sido entregado exitosamente!',
+        'Your order has been shipped and is on its way to your address.',
+      [OrderStatus.DELIVERED]: 'Your order has been delivered successfully!',
       [OrderStatus.CANCELLED]:
-        'Tu pedido ha sido cancelado. Si tienes preguntas, contáctanos.',
+        'Your order has been cancelled. If you have questions, please contact us.',
     };
 
-    return messages[newStatus] || 'El estado de tu pedido ha cambiado.';
+    return messages[newStatus] || 'Your order status has changed.';
   }
 
   private getNextSteps(status: OrderStatus): string | null {
     const steps: Partial<Record<OrderStatus, string>> = {
       [OrderStatus.PENDING]:
-        'Procesa tu pago para que podamos comenzar a preparar tu pedido.',
+        'Process your payment so we can start preparing your order.',
       [OrderStatus.PROCESSING]:
-        'Estamos preparando tus productos. Te notificaremos cuando sean enviados.',
+        'We are preparing your products. We will notify you when they are shipped.',
       [OrderStatus.PAID]:
-        'Tu pago ha sido confirmado. Prepararemos tu pedido para envío.',
+        'Your payment has been confirmed. We will prepare your order for shipping.',
       [OrderStatus.SHIPPED]:
-        'Mantente atento, tu pedido llegará pronto. Revisa el seguimiento para más detalles.',
+        'Stay tuned, your order will arrive soon. Check tracking for more details.',
     };
 
     return steps[status] || null;

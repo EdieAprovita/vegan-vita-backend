@@ -1,10 +1,21 @@
 import { IsUUID, IsInt, Min } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class OrderItemDto {
-  @IsUUID('4', { message: 'El ID del producto debe ser un UUID válido' })
+  @ApiProperty({
+    description: 'Product ID (UUID)',
+    example: '123e4567-e89b-12d3-a456-426614174000',
+    format: 'uuid',
+  })
+  @IsUUID('4', { message: 'Product ID must be a valid UUID' })
   productId: string;
 
-  @IsInt({ message: 'La cantidad debe ser un número entero' })
-  @Min(1, { message: 'La cantidad debe ser al menos 1' })
+  @ApiProperty({
+    description: 'Product quantity',
+    example: 2,
+    minimum: 1,
+  })
+  @IsInt({ message: 'Quantity must be an integer' })
+  @Min(1, { message: 'Quantity must be at least 1' })
   qty: number;
 }

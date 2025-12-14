@@ -33,6 +33,16 @@ export const validationSchema = Joi.object({
     .valid('development', 'production', 'test')
     .default('development'),
 
+  // Payments Mode
+  // 'stripe' = Real Stripe payments (production)
+  // 'dummy' = Mock payments for development/testing (NO real charges)
+  PAYMENTS_MODE: Joi.string()
+    .valid('stripe', 'dummy')
+    .default('dummy')
+    .messages({
+      'any.only': 'PAYMENTS_MODE must be either "stripe" or "dummy"',
+    }),
+
   // SMTP (optional in test)
   SMTP_HOST: Joi.when('NODE_ENV', {
     is: Joi.string().valid('production', 'development'),
@@ -47,28 +57,36 @@ export const validationSchema = Joi.object({
   // Frontend
   FRONTEND_URL: Joi.string().uri().optional(),
 
-  // Stripe
-  STRIPE_SECRET_KEY: Joi.when('NODE_ENV', {
-    is: 'test',
-    then: Joi.string().optional(),
-    otherwise: Joi.string()
-      .pattern(/^sk_(test|live)_[a-zA-Z0-9]{24,}$/)
-      .required()
-      .messages({
-        'string.pattern.base':
-          'STRIPE_SECRET_KEY must start with sk_test_ or sk_live_ followed by at least 24 characters',
-      }),
+  // Stripe - Required only when PAYMENTS_MODE=stripe and NOT in test environment
+  STRIPE_SECRET_KEY: Joi.when('PAYMENTS_MODE', {
+    is: 'stripe',
+    then: Joi.when('NODE_ENV', {
+      is: 'test',
+      then: Joi.string().optional(),
+      otherwise: Joi.string()
+        .pattern(/^sk_(test|live)_[a-zA-Z0-9]{24,}$/)
+        .required()
+        .messages({
+          'string.pattern.base':
+            'STRIPE_SECRET_KEY must start with sk_test_ or sk_live_ followed by at least 24 characters',
+        }),
+    }),
+    otherwise: Joi.string().optional(), // Not required in dummy mode
   }),
-  STRIPE_WEBHOOK_SECRET: Joi.when('NODE_ENV', {
-    is: 'test',
-    then: Joi.string().optional(),
-    otherwise: Joi.string()
-      .pattern(/^whsec_[a-zA-Z0-9]{32,}$/)
-      .required()
-      .messages({
-        'string.pattern.base':
-          'STRIPE_WEBHOOK_SECRET must start with whsec_ followed by at least 32 characters',
-      }),
+  STRIPE_WEBHOOK_SECRET: Joi.when('PAYMENTS_MODE', {
+    is: 'stripe',
+    then: Joi.when('NODE_ENV', {
+      is: 'test',
+      then: Joi.string().optional(),
+      otherwise: Joi.string()
+        .pattern(/^whsec_[a-zA-Z0-9]{32,}$/)
+        .required()
+        .messages({
+          'string.pattern.base':
+            'STRIPE_WEBHOOK_SECRET must start with whsec_ followed by at least 32 characters',
+        }),
+    }),
+    otherwise: Joi.string().optional(), // Not required in dummy mode
   }),
   STRIPE_PUBLISHABLE_KEY: Joi.string()
     .pattern(/^pk_(test|live)_[a-zA-Z0-9]{24,}$/)

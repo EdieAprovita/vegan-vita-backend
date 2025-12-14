@@ -25,7 +25,7 @@ export class ProductsService {
     private readonly reviewRepository: Repository<Review>,
   ) {}
 
-  // ==================== PRODUCTOS ====================
+  // ==================== PRODUCTS ====================
 
   async findAll(filterDto: FilterProductDto) {
     const {
@@ -41,7 +41,7 @@ export class ProductsService {
 
     let query = this.productRepository.createQueryBuilder('product');
 
-    // Búsqueda por nombre o descripción
+    // Search by name or description
     if (search) {
       query = query.where(
         '(product.name ILIKE :search OR product.description ILIKE :search)',
@@ -49,14 +49,14 @@ export class ProductsService {
       );
     }
 
-    // Filtrar por categoría
+    // Filter by category
     if (categoryId) {
       query = query.andWhere('product.categoryId = :categoryId', {
         categoryId,
       });
     }
 
-    // Filtrar por rango de precio
+    // Filter by price range
     if (minPrice !== undefined) {
       query = query.andWhere('product.price >= :minPrice', { minPrice });
     }
@@ -65,14 +65,14 @@ export class ProductsService {
       query = query.andWhere('product.price <= :maxPrice', { maxPrice });
     }
 
-    // Ordenamiento
+    // Sorting
     query = query.orderBy(`product.${sortBy}`, sortOrder);
 
-    // Paginación
+    // Pagination
     const skip = (page - 1) * limit;
     query = query.skip(skip).take(limit);
 
-    // Relaciones eager
+    // Eager relations
     query = query.leftJoinAndSelect('product.category', 'category');
     query = query.leftJoinAndSelect('product.reviews', 'reviews');
 
@@ -96,7 +96,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException(`Producto con slug "${slug}" no encontrado`);
+      throw new NotFoundException(`Product with slug "${slug}" not found`);
     }
 
     return product;
@@ -105,27 +105,25 @@ export class ProductsService {
   async create(createProductDto: CreateProductDto) {
     const { categoryId, name, ...rest } = createProductDto;
 
-    // Generar slug automáticamente
+    // Generate slug automatically
     const slug = this.generateSlug(name);
 
-    // Validar que la categoría existe
+    // Validate that the category exists
     const category = await this.categoryRepository.findOne({
       where: { id: categoryId },
     });
 
     if (!category) {
-      throw new NotFoundException(
-        `Categoría con id "${categoryId}" no encontrada`,
-      );
+      throw new NotFoundException(`Category with id "${categoryId}" not found`);
     }
 
-    // Validar slug único
+    // Validate unique slug
     const existingProduct = await this.productRepository.findOne({
       where: { slug },
     });
 
     if (existingProduct) {
-      throw new ConflictException(`El slug "${slug}" ya está en uso`);
+      throw new ConflictException(`Slug "${slug}" is already in use`);
     }
 
     const product = this.productRepository.create({
@@ -141,10 +139,10 @@ export class ProductsService {
     const product = await this.productRepository.findOne({ where: { id } });
 
     if (!product) {
-      throw new NotFoundException(`Producto con id "${id}" no encontrado`);
+      throw new NotFoundException(`Product with id "${id}" not found`);
     }
 
-    // Si cambia categoryId, validar que la nueva categoría existe
+    // If categoryId changes, validate that the new category exists
     if (updateProductDto.categoryId) {
       const category = await this.categoryRepository.findOne({
         where: { id: updateProductDto.categoryId },
@@ -152,14 +150,14 @@ export class ProductsService {
 
       if (!category) {
         throw new NotFoundException(
-          `Categoría con id "${updateProductDto.categoryId}" no encontrada`,
+          `Category with id "${updateProductDto.categoryId}" not found`,
         );
       }
 
       product.category = category;
     }
 
-    // Actualizar otros campos
+    // Update other fields
     Object.assign(product, updateProductDto);
 
     return await this.productRepository.save(product);
@@ -169,14 +167,14 @@ export class ProductsService {
     const product = await this.productRepository.findOne({ where: { id } });
 
     if (!product) {
-      throw new NotFoundException(`Producto con id "${id}" no encontrado`);
+      throw new NotFoundException(`Product with id "${id}" not found`);
     }
 
     await this.productRepository.remove(product);
-    return { message: 'Producto eliminado correctamente' };
+    return { message: 'Product deleted successfully' };
   }
 
-  // ==================== RESEÑAS ====================
+  // ==================== REVIEWS ====================
 
   async findReviews(productId: string) {
     const product = await this.productRepository.findOne({
@@ -184,9 +182,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException(
-        `Producto con id "${productId}" no encontrado`,
-      );
+      throw new NotFoundException(`Product with id "${productId}" not found`);
     }
 
     return await this.reviewRepository.find({
@@ -206,12 +202,10 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException(
-        `Producto con id "${productId}" no encontrado`,
-      );
+      throw new NotFoundException(`Product with id "${productId}" not found`);
     }
 
-    // Validar que el usuario no haya dejado reseña duplicada
+    // Validate that the user has not already left a duplicate review
     const existingReview = await this.reviewRepository.findOne({
       where: {
         product: { id: productId },
@@ -221,7 +215,7 @@ export class ProductsService {
 
     if (existingReview) {
       throw new ConflictException(
-        'Ya has dejado una reseña para este producto',
+        'You have already left a review for this product',
       );
     }
 
@@ -234,7 +228,7 @@ export class ProductsService {
     return await this.reviewRepository.save(review);
   }
 
-  // ==================== CATEGORÍAS ====================
+  // ==================== CATEGORIES ====================
 
   async findAllCategories() {
     return await this.categoryRepository.find({
@@ -250,13 +244,13 @@ export class ProductsService {
     });
 
     if (!category) {
-      throw new NotFoundException(`Categoría con id "${id}" no encontrada`);
+      throw new NotFoundException(`Category with id "${id}" not found`);
     }
 
     return category;
   }
 
-  // ==================== UTILIDADES ====================
+  // ==================== UTILITIES ====================
 
   private generateSlug(name: string): string {
     return name

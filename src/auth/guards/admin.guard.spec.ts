@@ -51,7 +51,7 @@ describe('AdminGuard', () => {
       ).toThrow(ForbiddenException);
       expect(() =>
         guard.canActivate(mockExecutionContext as ExecutionContext),
-      ).toThrow('Acceso denegado: se requieren permisos de administrador');
+      ).toThrow('Access denied: administrator permissions required');
     });
 
     it('should deny access when user does not exist', () => {
@@ -62,7 +62,7 @@ describe('AdminGuard', () => {
       ).toThrow(ForbiddenException);
       expect(() =>
         guard.canActivate(mockExecutionContext as ExecutionContext),
-      ).toThrow('Acceso denegado: se requieren permisos de administrador');
+      ).toThrow('Access denied: administrator permissions required');
     });
 
     it('should deny access when user object is undefined', () => {
