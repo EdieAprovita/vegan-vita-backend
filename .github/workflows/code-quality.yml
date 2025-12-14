@@ -10,7 +10,6 @@ jobs:
   sonarqube:
     name: SonarQube Analysis
     runs-on: ubuntu-latest
-    if: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_HOST_URL != '' }}
     continue-on-error: true
     steps:
       - name: Checkout code
@@ -18,18 +17,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          version: '10'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js and PNPM
+        uses: ./.github/actions/setup-node-pnpm
 
       - name: Build project
         run: pnpm run build
@@ -39,6 +28,7 @@ jobs:
         continue-on-error: true
 
       - name: SonarQube Scan
+        if: env.SONAR_TOKEN != ''
         uses: SonarSource/sonarqube-scan-action@master
         env:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
@@ -51,15 +41,11 @@ jobs:
             -Dsonar.tests=test
             -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info
 
-  sonarqube-skipped:
-    name: SonarQube (Skipped)
-    runs-on: ubuntu-latest
-    if: ${{ secrets.SONAR_TOKEN == '' || secrets.SONAR_HOST_URL == '' }}
-    steps:
-      - name: Explain skip
+      - name: SonarQube not configured
+        if: env.SONAR_TOKEN == ''
         run: |
           echo "## ℹ️ SonarQube skipped" >> $GITHUB_STEP_SUMMARY
-          echo "The SonarQube job was skipped because SONAR_HOST_URL or SONAR_TOKEN is not configured." >> $GITHUB_STEP_SUMMARY
+          echo "SonarQube is not configured. Set SONAR_HOST_URL and SONAR_TOKEN secrets to enable." >> $GITHUB_STEP_SUMMARY
 
   # ============================================
   # Análisis de complejidad de código
@@ -71,18 +57,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          version: '10'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js and PNPM
+        uses: ./.github/actions/setup-node-pnpm
 
       - name: Check code metrics
         run: |
@@ -99,18 +75,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          version: '10'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js and PNPM
+        uses: ./.github/actions/setup-node-pnpm
 
       - name: Run TypeScript compiler
         run: npx tsc --noEmit
@@ -125,18 +91,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '20'
-
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          version: '10'
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Setup Node.js and PNPM
+        uses: ./.github/actions/setup-node-pnpm
 
       - name: Check package licenses
         run: |

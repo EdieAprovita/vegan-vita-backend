@@ -13,39 +13,43 @@ jobs:
   deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && secrets.STAGING_SSH_KEY != '' && secrets.STAGING_SERVER_HOST != '' && secrets.STAGING_SERVER_USER != '' && secrets.STAGING_APP_PATH != '' && secrets.STAGING_APP_URL != '' && secrets.SLACK_WEBHOOK_URL != '' }}
+    env:
+      STAGING_SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+      STAGING_SERVER_HOST: ${{ secrets.STAGING_SERVER_HOST }}
+      STAGING_SERVER_USER: ${{ secrets.STAGING_SERVER_USER }}
+      STAGING_APP_PATH: ${{ secrets.STAGING_APP_PATH }}
+      STAGING_APP_URL: ${{ secrets.STAGING_APP_URL }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6
+      - name: Setup Node.js and PNPM
+        uses: ./.github/actions/setup-node-pnpm
         with:
           node-version: ${{ env.NODE_VERSION }}
-
-      - name: Setup PNPM
-        uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+          pnpm-version: ${{ env.PNPM_VERSION }}
 
       - name: Build application
         run: pnpm run build
 
       - name: Configure SSH
+        if: env.STAGING_SSH_KEY != ''
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ env.STAGING_SSH_KEY }}
+
+      - name: Add SSH known hosts
+        if: env.STAGING_SSH_KEY != '' && env.STAGING_SERVER_HOST != ''
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.STAGING_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.STAGING_SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ env.STAGING_SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to staging server
+        if: env.STAGING_SSH_KEY != '' && env.STAGING_SERVER_HOST != '' && env.STAGING_SERVER_USER != ''
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.STAGING_SERVER_USER }}@${{ secrets.STAGING_SERVER_HOST }} << 'EOF'
-          cd ${{ secrets.STAGING_APP_PATH }}
+          ssh ${{ env.STAGING_SERVER_USER }}@${{ env.STAGING_SERVER_HOST }} << 'EOF'
+          cd ${{ env.STAGING_APP_PATH }}
           git pull origin development
           pnpm install --frozen-lockfile
           pnpm run build
@@ -53,58 +57,15 @@ jobs:
           EOF
 
       - name: Health check
+        if: env.STAGING_APP_URL != ''
         run: |
           sleep 5
-          curl -f ${{ secrets.STAGING_APP_URL }}/api/health || exit 1
+          curl -f ${{ env.STAGING_APP_URL }}/api/health || exit 1
 
-      - name: Slack notification - Success
-        if: success()
-        uses: slackapi/slack-github-action@v2.1.1
-        with:
-          payload: |
-            {
-              "text": "✅ Staging deployment successful",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*✅ VeganVita Backend - Staging Deployment*\n*Status:* Success\n*Branch:* development\n*Commit:* ${{ github.sha }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
-      - name: Slack notification - Failure
-        if: failure()
-        uses: slackapi/slack-github-action@v2.1.1
-        with:
-          payload: |
-            {
-              "text": "❌ Staging deployment failed",
-              "blocks": [
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*❌ VeganVita Backend - Staging Deployment*\n*Status:* Failed\n*Branch:* development\n*Commit:* ${{ github.sha }}\n*Log:* ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-
-  deploy-skipped:
-    name: Deploy (Skipped)
-    runs-on: ubuntu-latest
-    if: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'push') && (secrets.STAGING_SSH_KEY == '' || secrets.STAGING_SERVER_HOST == '' || secrets.STAGING_SERVER_USER == '' || secrets.STAGING_APP_PATH == '' || secrets.STAGING_APP_URL == '' || secrets.SLACK_WEBHOOK_URL == '') }}
-    steps:
-      - name: Explain skip
+      - name: Deployment summary
+        if: always()
         run: |
-          echo "## ℹ️ Staging deploy skipped" >> $GITHUB_STEP_SUMMARY
-          echo "Missing staging deployment secrets. Configure STAGING_SSH_KEY, STAGING_SERVER_HOST, STAGING_SERVER_USER, STAGING_APP_PATH, STAGING_APP_URL and SLACK_WEBHOOK_URL to enable this workflow." >> $GITHUB_STEP_SUMMARY
+          echo "## 🚀 Staging Deployment" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** development" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY

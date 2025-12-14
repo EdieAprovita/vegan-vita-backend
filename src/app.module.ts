@@ -3,14 +3,24 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ProductsModule } from './products/products.module';
-import { User } from './auth/entities/user.entity';
+import { OrdersModule } from './orders/orders.module';
+import { PaymentsModule } from './payments/payments.module';
+import { User } from './users/entities/user.entity';
 import { Product, Category, Review } from './products/entities';
+import { Order, OrderItem } from './orders/entities';
 import { HealthController } from './health.controller';
+import { validationSchema } from './config/env.validation';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      validationSchema: validationSchema,
+      validationOptions: {
+        allowUnknown: true,
+        abortEarly: false, // Mostrar todos los errores, no solo el primero
+      },
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
@@ -22,7 +32,7 @@ import { HealthController } from './health.controller';
         username: configService.get<string>('DB_USER'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_NAME'),
-        entities: [User, Product, Category, Review],
+        entities: [User, Product, Category, Review, Order, OrderItem],
         synchronize: true,
         logging: false,
         retryAttempts: 10,
@@ -31,7 +41,10 @@ import { HealthController } from './health.controller';
       }),
     }),
     AuthModule,
+    UsersModule,
     ProductsModule,
+    OrdersModule,
+    PaymentsModule,
   ],
   controllers: [HealthController],
   providers: [],

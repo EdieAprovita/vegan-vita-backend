@@ -1,17 +1,18 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from './entities/user.entity';
+import { User } from '../users/entities/user.entity';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 describe('AuthController', () => {
   let controller: AuthController;
 
-  const mockUserRepository = {
-    findOne: jest.fn(),
+  const mockUsersService = {
+    findByEmail: jest.fn(),
     create: jest.fn(),
-    save: jest.fn(),
+    findOne: jest.fn(),
   };
 
   const mockJwtService = {
@@ -24,8 +25,8 @@ describe('AuthController', () => {
       providers: [
         AuthService,
         {
-          provide: getRepositoryToken(User),
-          useValue: mockUserRepository,
+          provide: UsersService,
+          useValue: mockUsersService,
         },
         {
           provide: JwtService,
@@ -39,5 +40,82 @@ describe('AuthController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+  describe('register', () => {
+    it('should register a new user', async () => {
+      const registerDto = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test User',
+      };
+
+      const expectedResult = {
+        user: {
+          id: '1',
+          email: registerDto.email,
+          name: registerDto.name,
+        },
+        access_token: 'jwt-token',
+      };
+
+      jest
+        .spyOn(controller['authService'], 'register')
+        .mockResolvedValue(expectedResult);
+
+      const result = await controller.register(registerDto);
+
+      expect(result).toEqual(expectedResult);
+      expect(controller['authService'].register).toHaveBeenCalledWith(
+        registerDto,
+      );
+    });
+  });
+
+  describe('login', () => {
+    it('should login a user', async () => {
+      const loginDto = {
+        email: 'test@example.com',
+        password: 'password123',
+      };
+
+      const expectedResult = {
+        user: {
+          id: '1',
+          email: loginDto.email,
+          name: 'Test User',
+        },
+        access_token: 'jwt-token',
+      };
+
+      jest
+        .spyOn(controller['authService'], 'login')
+        .mockResolvedValue(expectedResult);
+
+      const result = await controller.login(loginDto);
+
+      expect(result).toEqual(expectedResult);
+      expect(controller['authService'].login).toHaveBeenCalledWith(loginDto);
+    });
+  });
+
+  describe('getMe', () => {
+    it('should return current user information', async () => {
+      const user: Partial<User> = {
+        id: '1',
+        email: 'test@example.com',
+        name: 'Test User',
+      };
+
+      const req: Partial<RequestWithUser> = { user: user as User };
+
+      const result = await controller.getMe(req as RequestWithUser);
+
+      expect(result).toEqual({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+      });
+    });
   });
 });

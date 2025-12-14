@@ -18,6 +18,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { FilterProductDto } from './dto/filter-product.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 
 @Controller('products')
 export class ProductsController {
@@ -53,7 +54,7 @@ export class ProductsController {
   async createReview(
     @Param('productId') productId: string,
     @Body() createReviewDto: CreateReviewDto,
-    @Request() req: any,
+    @Request() req: RequestWithUser,
   ) {
     return this.productsService.createReview(
       productId,

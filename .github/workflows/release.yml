@@ -38,6 +38,17 @@ jobs:
         with:
           version: '10'
 
+      - name: Get PNPM Store Directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup PNPM Cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
+
       - name: Get version
         id: version
         run: |
@@ -64,15 +75,14 @@ jobs:
           cat CHANGELOG_CURRENT.md
 
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          release_name: Release ${{ steps.version.outputs.version }}
-          body_path: CHANGELOG_CURRENT.md
+          tag: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          bodyFile: CHANGELOG_CURRENT.md
           draft: false
           prerelease: false
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to npm (if needed)
         run: |
@@ -100,6 +110,17 @@ jobs:
         with:
           version: '10'
 
+      - name: Get PNPM Store Directory
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Setup PNPM Cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: ${{ runner.os }}-pnpm-
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -117,57 +138,3 @@ jobs:
           git commit -m "docs: update generated documentation for release" || true
           git push
 
-  # ============================================
-  # JOB 3: Notificaciones
-  # ============================================
-  notify:
-    name: Release Notifications
-    runs-on: ubuntu-latest
-    needs: [create-release, generate-docs]
-    if: always()
-
-    steps:
-      - name: Slack notification
-        uses: slackapi/slack-github-action@v2.1.1
-        with:
-          payload: |
-            {
-              "text": "📦 New Release",
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "📦 VeganVita Backend - New Release"
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Version:*\n${{ github.ref_name }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status:*\n✅ Released"
-                    }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Release:* ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ github.ref_name }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          SLACK_WEBHOOK_TYPE: INCOMING_WEBHOOK
-        if: success()
-
-      - name: GitHub Pages deployment (if applicable)
-        run: |
-          echo "📄 Documentation available at GitHub Pages"
