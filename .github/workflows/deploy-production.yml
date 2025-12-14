@@ -103,7 +103,7 @@ jobs:
 
       - name: Extract metadata
         id: meta
-        uses: docker/metadata-action@v4
+        uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}
           tags: |
@@ -113,7 +113,7 @@ jobs:
             type=raw,value=latest
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v6
         with:
           context: .
           push: true
@@ -150,13 +150,13 @@ jobs:
           ssh-private-key: ${{ secrets.PRODUCTION_SSH_KEY }}
 
       - name: Add SSH known hosts
-        if: ${{ env.PRODUCTION_SERVER_HOST != '' }}
+        if: ${{ env.PRODUCTION_SERVER_HOST != '' && env.PRODUCTION_SSH_KEY != '' }}
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ env.PRODUCTION_SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy application
-        if: ${{ env.PRODUCTION_SERVER_HOST != '' && env.PRODUCTION_SERVER_USER != '' && env.PRODUCTION_SSH_KEY != '' && env.PRODUCTION_APP_PATH != '' }}
+        if: ${{ env.PRODUCTION_SSH_KEY != '' && env.PRODUCTION_SERVER_HOST != '' && env.PRODUCTION_SERVER_USER != '' && env.PRODUCTION_APP_PATH != '' }}
         run: |
           ssh ${{ env.PRODUCTION_SERVER_USER }}@${{ env.PRODUCTION_SERVER_HOST }} << "EOF"
           set -e
