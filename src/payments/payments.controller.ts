@@ -12,6 +12,7 @@ import {
   HttpStatus,
   Inject,
   BadRequestException,
+  InternalServerErrorException,
   ParseUUIDPipe,
 } from '@nestjs/common';
 import {
@@ -153,19 +154,24 @@ export class PaymentsController {
     status: 400,
     description: 'Invalid signature or missing body',
   })
+  @ApiResponse({
+    status: 500,
+    description: 'Missing stripe-signature header',
+  })
   async handleWebhook(
     @Headers('stripe-signature') signature: string,
     @Request() req: RawBodyRequest<Request>,
   ): Promise<{ received: boolean; message?: string }> {
+    // Check for signature header first - required for all modes
+    if (!signature) {
+      throw new InternalServerErrorException('Missing stripe-signature header');
+    }
+
     if (this.isDummyMode) {
       return {
         received: true,
         message: '[MOCK] Webhook received in dummy mode - not processed',
       };
-    }
-
-    if (!signature) {
-      throw new BadRequestException('Missing stripe-signature header');
     }
 
     if (!req.rawBody) {
