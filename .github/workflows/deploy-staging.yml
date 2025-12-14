@@ -13,6 +13,12 @@ jobs:
   deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
+    env:
+      STAGING_SSH_KEY: ${{ secrets.STAGING_SSH_KEY }}
+      STAGING_SERVER_HOST: ${{ secrets.STAGING_SERVER_HOST }}
+      STAGING_SERVER_USER: ${{ secrets.STAGING_SERVER_USER }}
+      STAGING_APP_PATH: ${{ secrets.STAGING_APP_PATH }}
+      STAGING_APP_URL: ${{ secrets.STAGING_APP_URL }}
 
     steps:
       - name: Checkout code
@@ -28,19 +34,22 @@ jobs:
         run: pnpm run build
 
       - name: Configure SSH
+        if: env.STAGING_SSH_KEY != ''
         uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: ${{ secrets.STAGING_SSH_KEY }}
+          ssh-private-key: ${{ env.STAGING_SSH_KEY }}
 
       - name: Add SSH known hosts
+        if: env.STAGING_SSH_KEY != '' && env.STAGING_SERVER_HOST != ''
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.STAGING_SERVER_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ env.STAGING_SERVER_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to staging server
+        if: env.STAGING_SSH_KEY != '' && env.STAGING_SERVER_HOST != '' && env.STAGING_SERVER_USER != ''
         run: |
-          ssh ${{ secrets.STAGING_SERVER_USER }}@${{ secrets.STAGING_SERVER_HOST }} << 'EOF'
-          cd ${{ secrets.STAGING_APP_PATH }}
+          ssh ${{ env.STAGING_SERVER_USER }}@${{ env.STAGING_SERVER_HOST }} << 'EOF'
+          cd ${{ env.STAGING_APP_PATH }}
           git pull origin development
           pnpm install --frozen-lockfile
           pnpm run build
@@ -48,9 +57,10 @@ jobs:
           EOF
 
       - name: Health check
+        if: env.STAGING_APP_URL != ''
         run: |
           sleep 5
-          curl -f ${{ secrets.STAGING_APP_URL }}/api/health || exit 1
+          curl -f ${{ env.STAGING_APP_URL }}/api/health || exit 1
 
       - name: Deployment summary
         if: always()
