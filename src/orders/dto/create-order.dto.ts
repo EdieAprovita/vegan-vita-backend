@@ -59,7 +59,7 @@ export class CreateOrderDto {
 
   @ApiPropertyOptional({
     description: 'Tax price in USD',
-    example: 2.50,
+    example: 2.5,
     minimum: 0,
   })
   @IsNumber()

@@ -31,7 +31,9 @@ export class PaymentsService {
     const order = await this.ordersService.findOne(orderId);
 
     if (order.userId !== userId) {
-      throw new ForbiddenException('You do not have permission to pay this order');
+      throw new ForbiddenException(
+        'You do not have permission to pay this order',
+      );
     }
 
     // Check if order is already paid

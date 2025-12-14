@@ -28,7 +28,14 @@ export class PaymentIntentResponseDto {
   @ApiProperty({
     description: 'Payment Intent status',
     example: 'requires_payment_method',
-    enum: ['requires_payment_method', 'requires_confirmation', 'requires_action', 'processing', 'succeeded', 'canceled'],
+    enum: [
+      'requires_payment_method',
+      'requires_confirmation',
+      'requires_action',
+      'processing',
+      'succeeded',
+      'canceled',
+    ],
   })
   status: string;
 }

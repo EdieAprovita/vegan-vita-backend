@@ -53,8 +53,7 @@ export class ShippingAddressDto {
   @IsString()
   @IsNotEmpty({ message: 'Postal code is required' })
   @Matches(/^[0-9A-Za-z\s-]{3,10}$/, {
-    message:
-      'Postal code must be between 3 and 10 alphanumeric characters',
+    message: 'Postal code must be between 3 and 10 alphanumeric characters',
   })
   postalCode: string;
 

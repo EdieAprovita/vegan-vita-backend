@@ -114,9 +114,7 @@ export class ProductsService {
     });
 
     if (!category) {
-      throw new NotFoundException(
-        `Category with id "${categoryId}" not found`,
-      );
+      throw new NotFoundException(`Category with id "${categoryId}" not found`);
     }
 
     // Validate unique slug
@@ -184,9 +182,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException(
-        `Product with id "${productId}" not found`,
-      );
+      throw new NotFoundException(`Product with id "${productId}" not found`);
     }
 
     return await this.reviewRepository.find({
@@ -206,9 +202,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException(
-        `Product with id "${productId}" not found`,
-      );
+      throw new NotFoundException(`Product with id "${productId}" not found`);
     }
 
     // Validate that the user has not already left a duplicate review

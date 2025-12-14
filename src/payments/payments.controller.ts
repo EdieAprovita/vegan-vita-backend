@@ -80,7 +80,8 @@ export class PaymentsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Create Payment Intent',
-    description: 'Creates a Stripe Payment Intent to process a payment (requires authentication)',
+    description:
+      'Creates a Stripe Payment Intent to process a payment (requires authentication)',
   })
   @ApiBody({ type: CreatePaymentIntentDto })
   @ApiResponse({
@@ -112,10 +113,18 @@ export class PaymentsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get Payment Intent',
-    description: 'Gets the status of a specific Payment Intent (requires authentication)',
+    description:
+      'Gets the status of a specific Payment Intent (requires authentication)',
   })
-  @ApiParam({ name: 'paymentIntentId', description: 'Payment Intent ID', type: String })
-  @ApiResponse({ status: 200, description: 'Payment Intent retrieved successfully' })
+  @ApiParam({
+    name: 'paymentIntentId',
+    description: 'Payment Intent ID',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment Intent retrieved successfully',
+  })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   @ApiResponse({ status: 404, description: 'Payment Intent not found' })
   async getPaymentIntent(
@@ -131,7 +140,8 @@ export class PaymentsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Stripe Webhook',
-    description: 'Endpoint to receive Stripe webhook events (no authentication required)',
+    description:
+      'Endpoint to receive Stripe webhook events (no authentication required)',
   })
   @ApiHeader({
     name: 'stripe-signature',
@@ -139,7 +149,10 @@ export class PaymentsController {
     required: true,
   })
   @ApiResponse({ status: 200, description: 'Webhook received successfully' })
-  @ApiResponse({ status: 400, description: 'Invalid signature or missing body' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid signature or missing body',
+  })
   async handleWebhook(
     @Headers('stripe-signature') signature: string,
     @Request() req: RawBodyRequest<Request>,
@@ -181,11 +194,20 @@ export class PaymentsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Simulate successful payment (DUMMY mode only)',
-    description: 'Simulates a successful payment for testing (only available in dummy mode)',
+    description:
+      'Simulates a successful payment for testing (only available in dummy mode)',
   })
-  @ApiParam({ name: 'orderId', description: 'Order ID', type: String, format: 'uuid' })
+  @ApiParam({
+    name: 'orderId',
+    description: 'Order ID',
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({ status: 200, description: 'Payment simulated successfully' })
-  @ApiResponse({ status: 400, description: 'Dummy mode not active or invalid data' })
+  @ApiResponse({
+    status: 400,
+    description: 'Dummy mode not active or invalid data',
+  })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   async simulatePaymentSuccess(
@@ -205,9 +227,15 @@ export class PaymentsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Simulate failed payment (DUMMY mode only)',
-    description: 'Simulates a failed payment for testing (only available in dummy mode)',
+    description:
+      'Simulates a failed payment for testing (only available in dummy mode)',
   })
-  @ApiParam({ name: 'orderId', description: 'Order ID', type: String, format: 'uuid' })
+  @ApiParam({
+    name: 'orderId',
+    description: 'Order ID',
+    type: String,
+    format: 'uuid',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -217,8 +245,14 @@ export class PaymentsController {
     },
     required: false,
   })
-  @ApiResponse({ status: 200, description: 'Failed payment simulated successfully' })
-  @ApiResponse({ status: 400, description: 'Dummy mode not active or invalid data' })
+  @ApiResponse({
+    status: 200,
+    description: 'Failed payment simulated successfully',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Dummy mode not active or invalid data',
+  })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   async simulatePaymentFailure(
@@ -242,11 +276,20 @@ export class PaymentsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Simulate refund (DUMMY mode only)',
-    description: 'Simulates a refund for testing (only available in dummy mode)',
+    description:
+      'Simulates a refund for testing (only available in dummy mode)',
   })
-  @ApiParam({ name: 'orderId', description: 'Order ID', type: String, format: 'uuid' })
+  @ApiParam({
+    name: 'orderId',
+    description: 'Order ID',
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({ status: 200, description: 'Refund simulated successfully' })
-  @ApiResponse({ status: 400, description: 'Dummy mode not active or invalid data' })
+  @ApiResponse({
+    status: 400,
+    description: 'Dummy mode not active or invalid data',
+  })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   @ApiResponse({ status: 404, description: 'Order not found' })
   async simulateRefund(
@@ -265,9 +308,13 @@ export class PaymentsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Get all mock Payment Intents (DUMMY mode only, Admin)',
-    description: 'Gets all simulated payment intents for debugging (admin only in dummy mode)',
+    description:
+      'Gets all simulated payment intents for debugging (admin only in dummy mode)',
   })
-  @ApiResponse({ status: 200, description: 'Payment intents list retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment intents list retrieved successfully',
+  })
   @ApiResponse({ status: 400, description: 'Dummy mode not active' })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   @ApiResponse({ status: 403, description: 'Administrators only' })
@@ -286,9 +333,13 @@ export class PaymentsController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Clear all mock Payment Intents (DUMMY mode only, Admin)',
-    description: 'Deletes all simulated payment intents (admin only in dummy mode)',
+    description:
+      'Deletes all simulated payment intents (admin only in dummy mode)',
   })
-  @ApiResponse({ status: 200, description: 'Payment intents deleted successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment intents deleted successfully',
+  })
   @ApiResponse({ status: 400, description: 'Dummy mode not active' })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   @ApiResponse({ status: 403, description: 'Administrators only' })

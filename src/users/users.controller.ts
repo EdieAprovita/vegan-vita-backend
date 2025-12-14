@@ -36,9 +36,16 @@ export class UsersController {
     summary: 'List all users (Admin)',
     description: 'Gets a list of all users in the system (administrators only)',
   })
-  @ApiResponse({ status: 200, description: 'Users list retrieved successfully', type: [UserResponseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'Users list retrieved successfully',
+    type: [UserResponseDto],
+  })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
-  @ApiResponse({ status: 403, description: 'Only administrators can perform this action' })
+  @ApiResponse({
+    status: 403,
+    description: 'Only administrators can perform this action',
+  })
   async findAll() {
     const users = await this.usersService.findAll();
     return users.map((user) => new UserResponseDto(user));
@@ -49,7 +56,11 @@ export class UsersController {
     summary: 'Get current user profile',
     description: 'Gets the profile information of the authenticated user',
   })
-  @ApiResponse({ status: 200, description: 'Profile retrieved successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile retrieved successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   async getProfile(@Request() req) {
     const user = await this.usersService.findOne(req.user.id);
@@ -62,7 +73,11 @@ export class UsersController {
     description: 'Updates the profile information of the authenticated user',
   })
   @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({ status: 200, description: 'Profile updated successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Profile updated successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   async updateProfile(@Request() req, @Body() updateUserDto: UpdateUserDto) {
@@ -79,12 +94,25 @@ export class UsersController {
   @UseGuards(AdminGuard)
   @ApiOperation({
     summary: 'Get user by ID (Admin)',
-    description: 'Gets the information of a specific user (administrators only)',
+    description:
+      'Gets the information of a specific user (administrators only)',
   })
-  @ApiParam({ name: 'id', description: 'User ID', type: String, format: 'uuid' })
-  @ApiResponse({ status: 200, description: 'User found', type: UserResponseDto })
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    type: String,
+    format: 'uuid',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User found',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
-  @ApiResponse({ status: 403, description: 'Only administrators can perform this action' })
+  @ApiResponse({
+    status: 403,
+    description: 'Only administrators can perform this action',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   async findOne(@Param('id', ParseUUIDPipe) id: string) {
     const user = await this.usersService.findOne(id);
@@ -95,14 +123,27 @@ export class UsersController {
   @UseGuards(AdminGuard)
   @ApiOperation({
     summary: 'Update user (Admin)',
-    description: 'Updates the information of a specific user (administrators only)',
+    description:
+      'Updates the information of a specific user (administrators only)',
   })
-  @ApiParam({ name: 'id', description: 'User ID', type: String, format: 'uuid' })
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    type: String,
+    format: 'uuid',
+  })
   @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({ status: 200, description: 'User updated successfully', type: UserResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'User updated successfully',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Invalid data' })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
-  @ApiResponse({ status: 403, description: 'Only administrators can perform this action' })
+  @ApiResponse({
+    status: 403,
+    description: 'Only administrators can perform this action',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   async update(
     @Param('id', ParseUUIDPipe) id: string,
@@ -118,10 +159,18 @@ export class UsersController {
     summary: 'Delete user (Admin)',
     description: 'Deletes a user from the system (administrators only)',
   })
-  @ApiParam({ name: 'id', description: 'User ID', type: String, format: 'uuid' })
+  @ApiParam({
+    name: 'id',
+    description: 'User ID',
+    type: String,
+    format: 'uuid',
+  })
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
-  @ApiResponse({ status: 403, description: 'Only administrators can perform this action' })
+  @ApiResponse({
+    status: 403,
+    description: 'Only administrators can perform this action',
+  })
   @ApiResponse({ status: 404, description: 'User not found' })
   async remove(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.remove(id);

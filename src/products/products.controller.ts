@@ -45,7 +45,10 @@ export class ProductsController {
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   @ApiQuery({ name: 'categoryId', required: false, type: String })
   @ApiQuery({ name: 'search', required: false, type: String })
-  @ApiResponse({ status: 200, description: 'Products list retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Products list retrieved successfully',
+  })
   async findAll(@Query() filterDto: FilterProductDto) {
     return this.productsService.findAll(filterDto);
   }
@@ -55,7 +58,10 @@ export class ProductsController {
     summary: 'List categories',
     description: 'Gets all available product categories',
   })
-  @ApiResponse({ status: 200, description: 'Categories list retrieved successfully' })
+  @ApiResponse({
+    status: 200,
+    description: 'Categories list retrieved successfully',
+  })
   async findAllCategories() {
     return this.productsService.findAllCategories();
   }
@@ -65,7 +71,11 @@ export class ProductsController {
     summary: 'Get product by slug',
     description: 'Gets a specific product using its slug (friendly URL)',
   })
-  @ApiParam({ name: 'slug', description: 'Product slug', example: 'example-product' })
+  @ApiParam({
+    name: 'slug',
+    description: 'Product slug',
+    example: 'example-product',
+  })
   @ApiResponse({ status: 200, description: 'Product found' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   async findBySlug(@Param('slug') slug: string) {
@@ -96,7 +106,10 @@ export class ProductsController {
   @ApiParam({ name: 'productId', description: 'Product ID', type: String })
   @ApiBody({ type: CreateReviewDto })
   @ApiResponse({ status: 201, description: 'Review created successfully' })
-  @ApiResponse({ status: 400, description: 'A review already exists for this product' })
+  @ApiResponse({
+    status: 400,
+    description: 'A review already exists for this product',
+  })
   @ApiResponse({ status: 401, description: 'Not authenticated' })
   @ApiResponse({ status: 404, description: 'Product not found' })
   async createReview(
@@ -119,7 +132,8 @@ export class ProductsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create product (Admin)',
-    description: 'Creates a new product in the system (requires authentication)',
+    description:
+      'Creates a new product in the system (requires authentication)',
   })
   @ApiBody({ type: CreateProductDto })
   @ApiResponse({ status: 201, description: 'Product created successfully' })

@@ -237,8 +237,7 @@ export class NotificationsService {
     newStatus: OrderStatus,
   ): string {
     const messages: Partial<Record<OrderStatus, string>> = {
-      [OrderStatus.PROCESSING]:
-        'Your order is being processed by our team.',
+      [OrderStatus.PROCESSING]: 'Your order is being processed by our team.',
       [OrderStatus.PAID]:
         'We have confirmed your payment. Your order will be shipped soon.',
       [OrderStatus.SHIPPED]:
