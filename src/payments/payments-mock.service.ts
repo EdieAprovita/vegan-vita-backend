@@ -44,17 +44,17 @@ export class PaymentsMockService implements IPaymentsService {
     const order = await this.ordersService.findOne(orderId);
 
     if (order.userId !== userId) {
-      throw new ForbiddenException('No tienes permiso para pagar esta orden');
+      throw new ForbiddenException('You do not have permission to pay this order');
     }
 
     // Check if order is already paid
     if (order.isPaid) {
-      throw new BadRequestException('Esta orden ya ha sido pagada');
+      throw new BadRequestException('This order has already been paid');
     }
 
     // Check if order is cancelled
     if (order.status === OrderStatus.CANCELLED) {
-      throw new BadRequestException('No se puede pagar una orden cancelada');
+      throw new BadRequestException('Cannot pay a cancelled order');
     }
 
     // Check if payment intent already exists
@@ -64,7 +64,7 @@ export class PaymentsMockService implements IPaymentsService {
       );
       if (existingIntent) {
         if (existingIntent.status === 'succeeded') {
-          throw new BadRequestException('Esta orden ya ha sido pagada');
+          throw new BadRequestException('This order has already been paid');
         }
 
         return {
@@ -82,7 +82,7 @@ export class PaymentsMockService implements IPaymentsService {
 
     if (amountInCents < 50) {
       throw new BadRequestException(
-        'El monto mínimo de pago es $0.50 USD o equivalente',
+        'Minimum payment amount is $0.50 USD or equivalent',
       );
     }
 
@@ -128,7 +128,7 @@ export class PaymentsMockService implements IPaymentsService {
     const paymentIntent = this.mockPaymentIntents.get(paymentIntentId);
 
     if (!paymentIntent) {
-      throw new NotFoundException('Payment intent no encontrado');
+      throw new NotFoundException('Payment intent not found');
     }
 
     return paymentIntent;
@@ -140,12 +140,12 @@ export class PaymentsMockService implements IPaymentsService {
     const paymentIntent = this.mockPaymentIntents.get(paymentIntentId);
 
     if (!paymentIntent) {
-      throw new NotFoundException('Payment intent no encontrado');
+      throw new NotFoundException('Payment intent not found');
     }
 
     if (paymentIntent.status === 'succeeded') {
       throw new BadRequestException(
-        'No se puede cancelar un pago ya procesado',
+        'Cannot cancel an already processed payment',
       );
     }
 
@@ -167,11 +167,11 @@ export class PaymentsMockService implements IPaymentsService {
     const order = await this.ordersService.findOne(orderId);
 
     if (order.isPaid) {
-      throw new BadRequestException('Esta orden ya está pagada');
+      throw new BadRequestException('This order is already paid');
     }
 
     if (order.status === OrderStatus.CANCELLED) {
-      throw new BadRequestException('No se puede pagar una orden cancelada');
+      throw new BadRequestException('Cannot pay a cancelled order');
     }
 
     // Update mock payment intent if exists
@@ -201,7 +201,7 @@ export class PaymentsMockService implements IPaymentsService {
 
     return {
       success: true,
-      message: `[MOCK] Pago simulado exitosamente para orden ${orderId}`,
+      message: `[MOCK] Payment simulated successfully for order ${orderId}`,
       order: updatedOrder,
     };
   }
@@ -217,7 +217,7 @@ export class PaymentsMockService implements IPaymentsService {
     const order = await this.ordersService.findOne(orderId);
 
     if (order.isPaid) {
-      throw new BadRequestException('Esta orden ya está pagada');
+      throw new BadRequestException('This order is already paid');
     }
 
     // Update mock payment intent if exists
@@ -251,7 +251,7 @@ export class PaymentsMockService implements IPaymentsService {
 
     return {
       success: true,
-      message: `[MOCK] Pago fallido simulado para orden ${orderId}. Razón: ${reason || 'Fallo simulado'}`,
+      message: `[MOCK] Failed payment simulated for order ${orderId}. Reason: ${reason || 'Simulated failure'}`,
       order: updatedOrder,
     };
   }
@@ -267,7 +267,7 @@ export class PaymentsMockService implements IPaymentsService {
 
     if (!order.isPaid) {
       throw new BadRequestException(
-        'No se puede reembolsar una orden no pagada',
+        'Cannot refund an unpaid order',
       );
     }
 
@@ -289,7 +289,7 @@ export class PaymentsMockService implements IPaymentsService {
 
     return {
       success: true,
-      message: `[MOCK] Reembolso simulado exitosamente para orden ${orderId}`,
+      message: `[MOCK] Refund simulated successfully for order ${orderId}`,
       order: updatedOrder,
     };
   }

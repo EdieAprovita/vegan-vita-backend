@@ -295,7 +295,7 @@ describe('ProductsController', () => {
   describe('remove', () => {
     it('should remove a product', async () => {
       const productId = '1';
-      const expectedResult = { message: 'Producto eliminado correctamente' };
+      const expectedResult = { message: 'Product deleted successfully' };
 
       jest
         .spyOn(controller['productsService'], 'remove')

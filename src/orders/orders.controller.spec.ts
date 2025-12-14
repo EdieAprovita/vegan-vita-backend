@@ -179,12 +179,12 @@ describe('OrdersController', () => {
       ).rejects.toThrow(ForbiddenException);
       await expect(
         controller.getOrderById('order-1', createMockRequest(mockUser)),
-      ).rejects.toThrow('No tienes permiso para acceder a esta orden');
+      ).rejects.toThrow('You do not have permission to access this order');
     });
 
     it('should throw NotFoundException when order not found', async () => {
       mockOrdersService.findOne.mockRejectedValue(
-        new NotFoundException('Orden no encontrada'),
+        new NotFoundException('Order not found'),
       );
 
       await expect(

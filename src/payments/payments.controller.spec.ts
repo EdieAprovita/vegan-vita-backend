@@ -140,7 +140,7 @@ describe('PaymentsController', () => {
 
       expect(result).toEqual({
         received: true,
-        message: '[MOCK] Webhook recibido en modo dummy - no procesado',
+        message: '[MOCK] Webhook received in dummy mode - not processed',
       });
       // Should NOT call the real webhook handler in dummy mode
       expect(mockPaymentsService.handleWebhookEvent).not.toHaveBeenCalled();
@@ -151,7 +151,7 @@ describe('PaymentsController', () => {
     it('should simulate payment success', async () => {
       const mockResult = {
         success: true,
-        message: '[MOCK] Pago simulado exitosamente',
+        message: '[MOCK] Payment simulated successfully',
         order: { id: 'order-123', isPaid: true },
       };
       mockPaymentsMockService.simulatePaymentSuccess.mockResolvedValue(
@@ -169,7 +169,7 @@ describe('PaymentsController', () => {
     it('should simulate payment failure', async () => {
       const mockResult = {
         success: true,
-        message: '[MOCK] Pago fallido simulado',
+        message: '[MOCK] Failed payment simulated',
         order: { id: 'order-123', isPaid: false },
       };
       mockPaymentsMockService.simulatePaymentFailure.mockResolvedValue(
@@ -189,7 +189,7 @@ describe('PaymentsController', () => {
     it('should simulate refund', async () => {
       const mockResult = {
         success: true,
-        message: '[MOCK] Reembolso simulado',
+        message: '[MOCK] Refund simulated',
         order: { id: 'order-123', isRefunded: true },
       };
       mockPaymentsMockService.simulateRefund.mockResolvedValue(mockResult);

@@ -57,7 +57,7 @@ describe('JwtStrategy', () => {
       mockAuthService.validateUser.mockResolvedValue(null);
 
       await expect(strategy.validate(payload)).rejects.toThrow(
-        'Usuario no encontrado',
+        'User not found',
       );
       expect(mockAuthService.validateUser).toHaveBeenCalledWith(payload.id);
     });

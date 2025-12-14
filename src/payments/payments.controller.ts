@@ -14,6 +14,15 @@ import {
   BadRequestException,
   ParseUUIDPipe,
 } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiParam,
+  ApiBody,
+  ApiHeader,
+} from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { PaymentsService } from './payments.service';
 import { PaymentsMockService } from './payments-mock.service';
@@ -23,6 +32,7 @@ import { AdminGuard } from '../auth/guards/admin.guard';
 import { RequestWithUser } from '../common/interfaces/request-with-user.interface';
 import { PAYMENTS_SERVICE } from './interfaces/payment-service.interface';
 
+@ApiTags('payments')
 @Controller('payments')
 export class PaymentsController {
   private readonly isDummyMode: boolean;
@@ -40,18 +50,47 @@ export class PaymentsController {
    * Get current payment mode
    */
   @Get('mode')
+  @ApiOperation({
+    summary: 'Get current payment mode',
+    description: 'Returns the configured payment mode (dummy or stripe)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Payment mode retrieved successfully',
+    schema: {
+      example: {
+        mode: 'dummy',
+        isDummy: true,
+        message: '⚠️ DUMMY MODE active - Payments are NOT real',
+      },
+    },
+  })
   getPaymentMode(): { mode: string; isDummy: boolean; message: string } {
     return {
       mode: this.isDummyMode ? 'dummy' : 'stripe',
       isDummy: this.isDummyMode,
       message: this.isDummyMode
-        ? '⚠️ MODO DUMMY activo - Los pagos NO son reales'
-        : '💳 MODO STRIPE activo - Los pagos son REALES',
+        ? '⚠️ DUMMY MODE active - Payments are NOT real'
+        : '💳 STRIPE MODE active - Payments are REAL',
     };
   }
 
   @Post('create-intent')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Create Payment Intent',
+    description: 'Creates a Stripe Payment Intent to process a payment (requires authentication)',
+  })
+  @ApiBody({ type: CreatePaymentIntentDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Payment Intent created successfully',
+    type: PaymentIntentResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Invalid data' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
   async createPaymentIntent(
     @Body() createPaymentIntentDto: CreatePaymentIntentDto,
     @Request() req: RequestWithUser,
@@ -70,6 +109,15 @@ export class PaymentsController {
 
   @Get(':paymentIntentId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get Payment Intent',
+    description: 'Gets the status of a specific Payment Intent (requires authentication)',
+  })
+  @ApiParam({ name: 'paymentIntentId', description: 'Payment Intent ID', type: String })
+  @ApiResponse({ status: 200, description: 'Payment Intent retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 404, description: 'Payment Intent not found' })
   async getPaymentIntent(
     @Param('paymentIntentId') paymentIntentId: string,
   ): Promise<any> {
@@ -81,6 +129,17 @@ export class PaymentsController {
 
   @Post('webhook')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Stripe Webhook',
+    description: 'Endpoint to receive Stripe webhook events (no authentication required)',
+  })
+  @ApiHeader({
+    name: 'stripe-signature',
+    description: 'Stripe signature to verify the webhook',
+    required: true,
+  })
+  @ApiResponse({ status: 200, description: 'Webhook received successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid signature or missing body' })
   async handleWebhook(
     @Headers('stripe-signature') signature: string,
     @Request() req: RawBodyRequest<Request>,
@@ -88,7 +147,7 @@ export class PaymentsController {
     if (this.isDummyMode) {
       return {
         received: true,
-        message: '[MOCK] Webhook recibido en modo dummy - no procesado',
+        message: '[MOCK] Webhook received in dummy mode - not processed',
       };
     }
 
@@ -118,7 +177,17 @@ export class PaymentsController {
    */
   @Post('simulate/success/:orderId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Simulate successful payment (DUMMY mode only)',
+    description: 'Simulates a successful payment for testing (only available in dummy mode)',
+  })
+  @ApiParam({ name: 'orderId', description: 'Order ID', type: String, format: 'uuid' })
+  @ApiResponse({ status: 200, description: 'Payment simulated successfully' })
+  @ApiResponse({ status: 400, description: 'Dummy mode not active or invalid data' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
   async simulatePaymentSuccess(
     @Param('orderId', ParseUUIDPipe) orderId: string,
   ): Promise<{ success: boolean; message: string; order: any }> {
@@ -132,7 +201,26 @@ export class PaymentsController {
    */
   @Post('simulate/failure/:orderId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Simulate failed payment (DUMMY mode only)',
+    description: 'Simulates a failed payment for testing (only available in dummy mode)',
+  })
+  @ApiParam({ name: 'orderId', description: 'Order ID', type: String, format: 'uuid' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        reason: { type: 'string', example: 'Insufficient funds' },
+      },
+    },
+    required: false,
+  })
+  @ApiResponse({ status: 200, description: 'Failed payment simulated successfully' })
+  @ApiResponse({ status: 400, description: 'Dummy mode not active or invalid data' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
   async simulatePaymentFailure(
     @Param('orderId', ParseUUIDPipe) orderId: string,
     @Body() body?: { reason?: string },
@@ -150,7 +238,17 @@ export class PaymentsController {
    */
   @Post('simulate/refund/:orderId')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Simulate refund (DUMMY mode only)',
+    description: 'Simulates a refund for testing (only available in dummy mode)',
+  })
+  @ApiParam({ name: 'orderId', description: 'Order ID', type: String, format: 'uuid' })
+  @ApiResponse({ status: 200, description: 'Refund simulated successfully' })
+  @ApiResponse({ status: 400, description: 'Dummy mode not active or invalid data' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 404, description: 'Order not found' })
   async simulateRefund(
     @Param('orderId', ParseUUIDPipe) orderId: string,
   ): Promise<{ success: boolean; message: string; order: any }> {
@@ -164,6 +262,15 @@ export class PaymentsController {
    */
   @Get('simulate/intents')
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get all mock Payment Intents (DUMMY mode only, Admin)',
+    description: 'Gets all simulated payment intents for debugging (admin only in dummy mode)',
+  })
+  @ApiResponse({ status: 200, description: 'Payment intents list retrieved successfully' })
+  @ApiResponse({ status: 400, description: 'Dummy mode not active' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 403, description: 'Administrators only' })
   getAllMockPaymentIntents(): any[] {
     this.assertDummyMode();
     return this.paymentsMockService.getAllMockPaymentIntents();
@@ -175,13 +282,22 @@ export class PaymentsController {
    */
   @Post('simulate/clear')
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @ApiBearerAuth('JWT-auth')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Clear all mock Payment Intents (DUMMY mode only, Admin)',
+    description: 'Deletes all simulated payment intents (admin only in dummy mode)',
+  })
+  @ApiResponse({ status: 200, description: 'Payment intents deleted successfully' })
+  @ApiResponse({ status: 400, description: 'Dummy mode not active' })
+  @ApiResponse({ status: 401, description: 'Not authenticated' })
+  @ApiResponse({ status: 403, description: 'Administrators only' })
   clearAllMockPaymentIntents(): { success: boolean; message: string } {
     this.assertDummyMode();
     this.paymentsMockService.clearAllMockPaymentIntents();
     return {
       success: true,
-      message: '[MOCK] Todos los payment intents han sido eliminados',
+      message: '[MOCK] All payment intents have been deleted',
     };
   }
 
@@ -191,8 +307,8 @@ export class PaymentsController {
   private assertDummyMode(): void {
     if (!this.isDummyMode) {
       throw new BadRequestException(
-        'Los endpoints de simulación solo están disponibles en modo DUMMY. ' +
-          'Configure PAYMENTS_MODE=dummy en .env para habilitar esta funcionalidad.',
+        'Simulation endpoints are only available in DUMMY mode. ' +
+          'Set PAYMENTS_MODE=dummy in .env to enable this functionality.',
       );
     }
   }

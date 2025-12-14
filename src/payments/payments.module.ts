@@ -4,6 +4,7 @@ import { PaymentsController } from './payments.controller';
 import { PaymentsService } from './payments.service';
 import { PaymentsMockService } from './payments-mock.service';
 import { OrdersModule } from '../orders/orders.module';
+import { OrdersService } from '../orders/orders.service';
 import { PAYMENTS_SERVICE } from './interfaces/payment-service.interface';
 import Stripe from 'stripe';
 
@@ -16,7 +17,7 @@ const logger = new Logger('PaymentsModule');
     // Factory to provide correct payments service based on PAYMENTS_MODE
     {
       provide: PAYMENTS_SERVICE,
-      inject: [ConfigService, OrdersModule],
+      inject: [ConfigService, OrdersService],
       useFactory: (configService: ConfigService, ordersService: any) => {
         const paymentsMode = configService.get<string>(
           'PAYMENTS_MODE',

@@ -108,7 +108,7 @@ describe('AuthService', () => {
         ConflictException,
       );
       await expect(service.register(registerDto)).rejects.toThrow(
-        'El email ya está registrado',
+        'Email is already registered',
       );
       expect(mockUsersService.findByEmail).toHaveBeenCalledWith(
         registerDto.email,
@@ -171,7 +171,7 @@ describe('AuthService', () => {
         UnauthorizedException,
       );
       await expect(service.login(loginDto)).rejects.toThrow(
-        'Credenciales inválidas',
+        'Invalid credentials',
       );
       expect(mockUsersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
     });
@@ -196,7 +196,7 @@ describe('AuthService', () => {
         UnauthorizedException,
       );
       await expect(service.login(loginDto)).rejects.toThrow(
-        'Credenciales inválidas',
+        'Invalid credentials',
       );
       expect(mockUsersService.findByEmail).toHaveBeenCalledWith(loginDto.email);
       expect(bcrypt.compare).toHaveBeenCalledWith(

@@ -97,10 +97,10 @@ async function seed() {
       where: { slug: categoryData.slug },
     });
     if (category) {
-      console.log(`⏭️  Categoría ya existe: ${categoryData.name}`);
+      console.log(`⏭️  Category already exists: ${categoryData.name}`);
     } else {
       category = await categoryRepo.save(categoryData);
-      console.log(`✅ Categoría creada: ${categoryData.name}`);
+      console.log(`✅ Category created: ${categoryData.name}`);
     }
     categoryMap.set(categoryData.slug, category);
   }
@@ -188,14 +188,14 @@ async function seed() {
       where: { slug: productData.slug },
     });
     if (exists) {
-      console.log(`⏭️  Producto ya existe: ${productData.name}`);
+      console.log(`⏭️  Product already exists: ${productData.name}`);
     } else {
       await productRepo.save(productData);
-      console.log(`✅ Producto creado: ${productData.name}`);
+      console.log(`✅ Product created: ${productData.name}`);
     }
   }
 
-  console.log('\n✨ Seeding completado');
+  console.log('\n✨ Seeding completed');
   await app.close();
 }
 

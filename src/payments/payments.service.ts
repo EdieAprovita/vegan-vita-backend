@@ -31,17 +31,17 @@ export class PaymentsService {
     const order = await this.ordersService.findOne(orderId);
 
     if (order.userId !== userId) {
-      throw new ForbiddenException('No tienes permiso para pagar esta orden');
+      throw new ForbiddenException('You do not have permission to pay this order');
     }
 
     // Check if order is already paid
     if (order.isPaid) {
-      throw new BadRequestException('Esta orden ya ha sido pagada');
+      throw new BadRequestException('This order has already been paid');
     }
 
     // Check if order is cancelled
     if (order.status === OrderStatus.CANCELLED) {
-      throw new BadRequestException('No se puede pagar una orden cancelada');
+      throw new BadRequestException('Cannot pay a cancelled order');
     }
 
     // Check if payment intent already exists
@@ -52,7 +52,7 @@ export class PaymentsService {
         );
 
         if (existingIntent.status === 'succeeded') {
-          throw new BadRequestException('Esta orden ya ha sido pagada');
+          throw new BadRequestException('This order has already been paid');
         }
 
         // Return existing payment intent
@@ -76,7 +76,7 @@ export class PaymentsService {
 
     if (amountInCents < 50) {
       throw new BadRequestException(
-        'El monto mínimo de pago es $0.50 USD o equivalente',
+        'Minimum payment amount is $0.50 USD or equivalent',
       );
     }
 
@@ -89,7 +89,7 @@ export class PaymentsService {
           orderId: order.id,
           userId: userId,
         },
-        description: `Pago de orden #${order.id}`,
+        description: `Payment for order #${order.id}`,
         automatic_payment_methods: {
           enabled: true,
         },
@@ -118,7 +118,7 @@ export class PaymentsService {
         error.stack,
       );
       throw new BadRequestException(
-        `Error al crear la intención de pago: ${error.message}`,
+        `Error creating payment intent: ${error.message}`,
       );
     }
   }
@@ -132,7 +132,7 @@ export class PaymentsService {
       return paymentIntent;
     } catch (error) {
       this.logger.error(`Failed to retrieve payment intent: ${error.message}`);
-      throw new NotFoundException('Payment intent no encontrado');
+      throw new NotFoundException('Payment intent not found');
     }
   }
 
@@ -146,7 +146,7 @@ export class PaymentsService {
     } catch (error) {
       this.logger.error(`Failed to cancel payment intent: ${error.message}`);
       throw new BadRequestException(
-        `Error al cancelar el pago: ${error.message}`,
+        `Error canceling payment: ${error.message}`,
       );
     }
   }
@@ -157,7 +157,7 @@ export class PaymentsService {
     );
 
     if (!webhookSecret) {
-      throw new BadRequestException('Webhook secret no configurado');
+      throw new BadRequestException('Webhook secret not configured');
     }
 
     let event: Stripe.Event;

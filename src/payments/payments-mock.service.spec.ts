@@ -1,8 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  PaymentsMockService,
-  MockPaymentIntent,
-} from './payments-mock.service';
+import { PaymentsMockService } from './payments-mock.service';
 import { OrdersService } from '../orders/orders.service';
 import {
   BadRequestException,
@@ -18,7 +15,7 @@ describe('PaymentsMockService', () => {
   const mockOrder = {
     id: 'order-123',
     userId: 'user-123',
-    totalPrice: 100.0,
+    totalPrice: 100,
     isPaid: false,
     status: OrderStatus.PENDING,
     stripePaymentIntentId: null,
@@ -280,7 +277,7 @@ describe('PaymentsMockService', () => {
       const result = await service.simulateRefund('order-123');
 
       expect(result.success).toBe(true);
-      expect(result.message).toContain('Reembolso');
+      expect(result.message).toContain('Refund');
       expect(mockOrdersService.updatePaymentStatus).toHaveBeenCalledWith(
         'order-123',
         expect.objectContaining({

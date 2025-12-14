@@ -171,7 +171,7 @@ describe('ProductsService', () => {
 
       await expect(service.findBySlug(slug)).rejects.toThrow(NotFoundException);
       await expect(service.findBySlug(slug)).rejects.toThrow(
-        `Producto con slug "${slug}" no encontrado`,
+        `Product with slug "${slug}" not found`,
       );
     });
   });
@@ -226,7 +226,7 @@ describe('ProductsService', () => {
         NotFoundException,
       );
       await expect(service.create(createProductDto)).rejects.toThrow(
-        `Categoría con id "${createProductDto.categoryId}" no encontrada`,
+        `Category with id "${createProductDto.categoryId}" not found`,
       );
     });
 
@@ -297,7 +297,7 @@ describe('ProductsService', () => {
         NotFoundException,
       );
       await expect(service.update(productId, updateProductDto)).rejects.toThrow(
-        `Producto con id "${productId}" no encontrado`,
+        `Product with id "${productId}" not found`,
       );
     });
 
@@ -365,7 +365,7 @@ describe('ProductsService', () => {
         where: { id: productId },
       });
       expect(mockProductRepository.remove).toHaveBeenCalledWith(product);
-      expect(result).toEqual({ message: 'Producto eliminado correctamente' });
+      expect(result).toEqual({ message: 'Product deleted successfully' });
     });
 
     it('should throw NotFoundException if product not found', async () => {
@@ -377,7 +377,7 @@ describe('ProductsService', () => {
         NotFoundException,
       );
       await expect(service.remove(productId)).rejects.toThrow(
-        `Producto con id "${productId}" no encontrado`,
+        `Product with id "${productId}" not found`,
       );
     });
   });
@@ -505,7 +505,7 @@ describe('ProductsService', () => {
       ).rejects.toThrow(ConflictException);
       await expect(
         service.createReview(productId, createReviewDto, user),
-      ).rejects.toThrow('Ya has dejado una reseña para este producto');
+      ).rejects.toThrow('You have already left a review for this product');
     });
   });
 
@@ -557,7 +557,7 @@ describe('ProductsService', () => {
         NotFoundException,
       );
       await expect(service.findCategoryById(categoryId)).rejects.toThrow(
-        `Categoría con id "${categoryId}" no encontrada`,
+        `Category with id "${categoryId}" not found`,
       );
     });
   });
